@@ -54,14 +54,20 @@ public class DeviceScanner {
           String name = event.getName();
           String address = event.getInfo().getHostAddresses()[0];
           String id = event.getInfo().getPropertyString("device_id");
+          String type = event.getInfo().getPropertyString("device_type");
 
           if (!isIPv4(address)) {
+            return;
+          }
+
+          if (type.equals("desktop")) {
             return;
           }
 
           if (id.equals(deviceId)) {
             return;
           }
+
 
           onDeviceDiscovered.onDiscovered(id, name, address);
         }

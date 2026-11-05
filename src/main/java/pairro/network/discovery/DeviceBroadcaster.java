@@ -19,7 +19,7 @@ public class DeviceBroadcaster {
       Map<String, String> properties = new HashMap<>();
       properties.put("device_id", deviceId);
       properties.put("version", "1");
-      properties.put("type", "desktop");
+      properties.put("device_type", "desktop");
 
       ServiceInfo serviceInfo = ServiceInfo.create(
           serviceType,
