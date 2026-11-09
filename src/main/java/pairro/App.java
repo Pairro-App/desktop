@@ -2,6 +2,7 @@ package pairro;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,7 +14,6 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-
 import pairro.app.AppCoordinator;
 import pairro.app.PeripheralControllers;
 import pairro.audio.AudioController;
@@ -38,6 +38,7 @@ import pairro.network.server.ClientHandler;
 import pairro.network.session.UDPSessionState;
 import pairro.notification.NotificationEventListener;
 import pairro.notification.NotificationService;
+import pairro.notification.NotificationType;
 import pairro.notification.toast.ToastNotifier;
 import pairro.pairing.PairingCoordinator;
 import pairro.pairing.PairingService;
@@ -48,11 +49,19 @@ import pairro.ui.component.common.TitleBar;
 import pairro.ui.icon.IconLoader;
 import pairro.ui.tray.TrayManager;
 import pairro.ui.view.DashboardView;
+import pairro.update.AppVersion;
+import pairro.update.GitHubReleaseProvider;
+import pairro.update.UpdateChecker;
+import pairro.update.UpdateScheduler;
 
 public class App extends Application {
   private static final int TCP_PORT = 28401;
   private static final int UDP_PORT = 28402;
   private static final String APP_TITLE = "Pairro";
+  private static final String GITHUB_OWNER = "Pairro-App";
+  private static final String GITHUB_REPO = "desktop";
+  private static final Duration UPDATE_INITIAL_DELAY = Duration.ofSeconds(10);
+  private static final Duration UPDATE_INTERVAL = Duration.ofHours(6);
 
   @Override
   public void start(Stage primaryStage) {
@@ -75,6 +84,14 @@ public class App extends Application {
 
     NotificationService notificationService = new NotificationService(settingsStore, new ToastNotifier(trayManager::restoreWindow));
     controller.setEventListener(new NotificationEventListener(dashboard, notificationService));
+
+    controller.setUpdateListener(release -> {
+      notificationService.publish(NotificationType.UPDATE, release.version().toString());
+      dashboard.showUpdateAvailable(
+          "Version " + release.version() + " is available",
+          () -> getHostServices().showDocument(release.pageUrl().toString()));
+    });
+    controller.startUpdateChecks();
 
     ResizableCanvas canvas = new ResizableCanvas();
     canvas.getStyleClass().add("white-canvas");
@@ -169,6 +186,17 @@ public class App extends Application {
       settingsStore::getDeviceName);
 
     controller.setConnectionLifecycle(connectionLifecycle);
+
+    AppVersion.current().ifPresentOrElse(
+        version -> controller.setUpdateScheduler(new UpdateScheduler(
+            new UpdateChecker(
+                new GitHubReleaseProvider(GitHubReleaseProvider.defaultHttpClient(), GITHUB_OWNER, GITHUB_REPO),
+                version,
+                settingsStore),
+            UPDATE_INITIAL_DELAY,
+            UPDATE_INTERVAL,
+            controller::onUpdateAvailable)),
+        () -> System.err.println("[App] App version unknown, update checks disabled"));
 
     networkManager.setPairingListener(new NetworkPairingListener() {
       @Override

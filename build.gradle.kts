@@ -5,6 +5,8 @@ plugins {
   id("org.beryx.runtime") version "1.13.1"
 }
 
+version = "0.9.1"
+
 repositories {
   mavenCentral()
 }
@@ -31,6 +33,16 @@ java {
   }
 }
 
+tasks.processResources {
+  val appVersion = project.version.toString()
+
+  inputs.property("version", appVersion)
+
+  filesMatching("version.properties") {
+    expand("version" to appVersion)
+  }
+}
+
 runtime {
   options.set(listOf("--strip-debug", "--compress", "2", "--no-header-files", "--no-man-pages"))
   modules.set(listOf(
@@ -51,7 +63,7 @@ runtime {
     imageOptions = listOf("--icon", "src/main/resources/icon.ico")
     installerOptions = listOf(
       "--vendor", "Pairro",
-      "--app-version", "0.9.0",
+      "--app-version", project.version.toString(),
       "--win-menu",
       "--win-shortcut",
       "--win-dir-chooser",

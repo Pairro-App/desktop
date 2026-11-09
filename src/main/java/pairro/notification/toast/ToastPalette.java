@@ -13,6 +13,7 @@ public final class ToastPalette {
       case PAIRING_REQUEST -> MAGENTA;
       case DEVICE_CONNECTED -> TEAL;
       case DEVICE_DISCONNECTED -> MUTED;
+      case UPDATE -> MAGENTA;
     };
   }
 }

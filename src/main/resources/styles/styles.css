@@ -731,6 +731,12 @@
 }
 
 /* Banners & Notifications */
+.update-banner-download {
+  -fx-font-family: "Plus Jakarta Sans";
+  -fx-font-size: 12.5px;
+  -fx-font-weight: bold;
+  -fx-text-fill: #ffffff;
+}
 
 .pairing-banner {
   -fx-background-color: #ffffff;

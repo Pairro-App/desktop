@@ -3,7 +3,8 @@ package pairro.notification;
 public enum NotificationType {
   PAIRING_REQUEST("Pairing request", "%s wants to pair with this PC"),
   DEVICE_CONNECTED("Device connected", "%s is now connected"),
-  DEVICE_DISCONNECTED("Device disconnected", "%s has disconnected");
+  DEVICE_DISCONNECTED("Device disconnected", "%s has disconnected"),
+  UPDATE("Update available", "Version %s is now available");
 
   private final String title;
   private final String messageFormat;

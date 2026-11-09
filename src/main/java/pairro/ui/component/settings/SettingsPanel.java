@@ -42,6 +42,13 @@ public class SettingsPanel extends VBox {
 
     VBox cards = new VBox(12,
         new SettingsCard("Startup",
+
+            SettingsRows.switchRow(
+              "Check for updates",
+              "Check for updates on Pairro launch",
+              settingsStore.isCheckUpdate(),
+              settingsStore::setCheckUpdate),
+
             SettingsRows.switchRow(
                 "Open on Windows startup",
                 "Launch Pairro when you sign in to Windows",

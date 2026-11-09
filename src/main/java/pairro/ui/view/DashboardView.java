@@ -24,6 +24,7 @@ import pairro.ui.component.device.DevicesListPanel;
 import pairro.ui.component.information.InformationPanel;
 import pairro.ui.component.pairing.PairingBanner;
 import pairro.ui.component.settings.SettingsPanel;
+import pairro.ui.component.update.UpdateBanner;
 
 public class DashboardView implements DashboardEventListener {
   private static final double SHEET_OFFSET = 700;
@@ -36,6 +37,7 @@ public class DashboardView implements DashboardEventListener {
   private TranslateTransition settingsAnimation;
   private SettingsPanel settingsPanel;
   private final PairingBanner pairingBanner = new PairingBanner();
+  private final UpdateBanner updateBanner = new UpdateBanner();
 
   private DevicesListPanel devicesListPanel;
   private InformationPanel informationPanel;
@@ -70,9 +72,14 @@ public class DashboardView implements DashboardEventListener {
     clip.heightProperty().bind(mainContent.heightProperty());
     mainContent.setClip(clip);
 
-    rootContainer = new VBox(mainContent, pairingBanner);
+    rootContainer = new VBox(mainContent, pairingBanner, updateBanner);
     VBox.setVgrow(mainContent, Priority.ALWAYS);
     VBox.setMargin(pairingBanner, new Insets(0, 12, 12, 12));
+    VBox.setMargin(updateBanner, new Insets(0, 12, 12, 12));
+  }
+
+  public void showUpdateAvailable(String message, Runnable onDownload) {
+    Platform.runLater(() -> updateBanner.show(message, onDownload));
   }
 
   private void initPanels() {

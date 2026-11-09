@@ -9,6 +9,8 @@ import pairro.network.lifecycle.ConnectionLifecycleManager;
 import pairro.network.server.ClientHandler;
 import pairro.pairing.DashboardEventListener;
 import pairro.pairing.PairingCoordinator;
+import pairro.update.Release;
+import pairro.update.UpdateScheduler;
 
 public class AppCoordinator {
   private final PairingCoordinator pairing;
@@ -17,12 +19,36 @@ public class AppCoordinator {
   private ConnectionLifecycleManager connectionLifecycle;
   private DashboardEventListener eventListener;
   private Consumer<Boolean> connectionStateListener;
+  private UpdateScheduler updateScheduler;
+  private volatile Consumer<Release> updateListener;
 
   public AppCoordinator(
       PairingCoordinator pairing,
       DeviceDirectory devices) {
     this.pairing = pairing;
     this.devices = devices;
+  }
+
+  public void setUpdateScheduler(UpdateScheduler updateScheduler) {
+    this.updateScheduler = updateScheduler;
+  }
+
+  public void setUpdateListener(Consumer<Release> listener) {
+    this.updateListener = listener;
+  }
+
+  public void startUpdateChecks() {
+    if (this.updateScheduler != null) {
+      this.updateScheduler.start();
+    }
+  }
+
+  public void onUpdateAvailable(Release release) {
+    Consumer<Release> listener = this.updateListener;
+
+    if (listener != null) {
+      listener.accept(release);
+    }
   }
 
   public void setConnectionLifecycle(ConnectionLifecycleManager connectionLifecycle) {
@@ -156,6 +182,10 @@ public class AppCoordinator {
   }
 
   public void shutdown() {
+    if (this.updateScheduler != null) {
+      this.updateScheduler.stop();
+    }
+
     if (this.connectionLifecycle != null) {
       this.connectionLifecycle.shutdown();
     }

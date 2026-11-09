@@ -8,6 +8,7 @@ public class SettingsStore extends BaseStore {
   private static final String AUTO_START_DISCOVERABILITY_KEY = "autoStartDiscoverability";
   private static final String SHOW_NOTIFICATIONS_KEY = "showNotifications";
   private static final String CONFIRM_BEFORE_UNPAIRING_KEY = "confirmBeforeUnpairing";
+  private static final String CHECK_UPDATES = "checkUpdates";
 
   public SettingsStore() {
     super("settings.properties");
@@ -73,6 +74,15 @@ public class SettingsStore extends BaseStore {
 
   public synchronized void setConfirmBeforeUnpairing(boolean value) {
     this.props.setProperty(CONFIRM_BEFORE_UNPAIRING_KEY, String.valueOf(value));
+    persist("pairro settings");
+  }
+
+  public synchronized boolean isCheckUpdate() {
+    return Boolean.parseBoolean(this.props.getProperty(CHECK_UPDATES, "true"));
+  }
+
+  public synchronized void setCheckUpdate(boolean value) {
+    this.props.setProperty(CHECK_UPDATES, String.valueOf(value));
     persist("pairro settings");
   }
 }
