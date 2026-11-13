@@ -11,7 +11,7 @@ public class RobotProvider {
       try {
         instance = new Robot();
       } catch (AWTException e) {
-        throw new IllegalStateException("Error has occured.", e);
+        throw new IllegalStateException("Could not create Robot: " + e.getMessage(), e);
       }
     }
 

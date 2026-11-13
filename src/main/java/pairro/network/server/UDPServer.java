@@ -22,15 +22,19 @@ public class UDPServer extends Thread {
   public void run() {
     this.isRunning = true;
 
-    try {
-      this.socket = new DatagramSocket(port);
+    try (DatagramSocket datagramSocket = new DatagramSocket(port)) {
+      this.socket = datagramSocket;
       byte[] buffer = new byte[2048];
 
       while (isRunning) {
         DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
         socket.receive(packet);
 
-        manager.handleUdpPacket(packet.getData(), packet.getLength(), packet.getAddress());
+        try {
+          manager.handleUdpPacket(packet.getData(), packet.getLength(), packet.getAddress());
+        } catch (RuntimeException exception) {
+          System.err.println("[UDP] Failed to handle packet: " + exception.getMessage());
+        }
       }
     } catch (IOException exception) {
       if (isRunning) {

@@ -44,17 +44,19 @@ public class AppCoordinator {
   }
 
   public void onUpdateAvailable(Release release) {
-    Consumer<Release> listener = this.updateListener;
-
-    if (listener != null) {
-      listener.accept(release);
-    }
+    this.updateListener.accept(release);
   }
 
   public void setConnectionLifecycle(ConnectionLifecycleManager connectionLifecycle) {
     this.connectionLifecycle = connectionLifecycle;
 
-    setupConnectionLifecycleListener();
+    this.connectionLifecycle.setConnectionStateListener(isConnected -> {
+      this.connectionStateListener.accept(isConnected);
+
+      if (!isConnected) {
+        notifyDevicesChanged();
+      }
+    });
   }
 
   public void setEventListener(DashboardEventListener listener) {
@@ -67,43 +69,19 @@ public class AppCoordinator {
   }
 
   public void setConnectionTransitionListener(Consumer<Boolean> listener) {
-    if (this.connectionLifecycle != null) {
-      this.connectionLifecycle.setConnectionTransitionListener(listener);
-    }
-  }
-
-  private void setupConnectionLifecycleListener() {
-    if (this.connectionLifecycle == null) {
-      return;
-    }
-
-    this.connectionLifecycle.setConnectionStateListener(isConnected -> {
-      if (this.connectionStateListener != null) {
-        this.connectionStateListener.accept(isConnected);
-      }
-
-      if (!isConnected) {
-        notifyDevicesChanged();
-      }
-    });
+    this.connectionLifecycle.setConnectionTransitionListener(listener);
   }
 
   public void renameDevice() {
-    if (this.connectionLifecycle != null) {
-      this.connectionLifecycle.rename();
-    }
+    this.connectionLifecycle.rename();
   }
 
   public void toggleConnection() {
-    if (this.connectionLifecycle != null) {
-      this.connectionLifecycle.toggle();
-    }
+    this.connectionLifecycle.toggle();
   }
 
   public void refreshDevices() {
-    if (this.connectionLifecycle != null) {
-      this.connectionLifecycle.refreshDevices();
-    }
+    this.connectionLifecycle.refreshDevices();
   }
 
   public void handlePairingResponse(
@@ -140,13 +118,9 @@ public class AppCoordinator {
   public void onDataReceived(
       String data,
       ClientHandler client) {
-    if (this.eventListener == null) {
-      return;
-    }
-
     String hostAddress = null;
 
-    if (client != null && client.getAddress() != null) {
+    if (client != null) {
       hostAddress = client.getAddress().getHostAddress();
     }
 
@@ -160,16 +134,10 @@ public class AppCoordinator {
   }
 
   private void notifyDevicesChanged() {
-    if (this.eventListener != null) {
-      this.eventListener.onDeviceListUpdated(this.devices.getDevicesList());
-    }
+    this.eventListener.onDeviceListUpdated(this.devices.getDevicesList());
   }
 
   public boolean isConnected() {
-    if (this.connectionLifecycle == null) {
-      return false;
-    }
-
     return this.connectionLifecycle.isConnected();
   }
 
@@ -186,8 +154,6 @@ public class AppCoordinator {
       this.updateScheduler.stop();
     }
 
-    if (this.connectionLifecycle != null) {
-      this.connectionLifecycle.shutdown();
-    }
+    this.connectionLifecycle.shutdown();
   }
 }

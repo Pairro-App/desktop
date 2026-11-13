@@ -80,15 +80,16 @@ public class ConnectionLifecycleManager {
           scanner.start();
           networkManager.start();
         } else {
-          scanner.stop();
-          broadcaster.stop();
-          networkManager.stop();
-          devices.clear();
+          stopServices();
         }
 
         connected = goingOnline;
       } catch (Exception e) {
         System.err.println("[Dashboard] Failed to toggle connection: " + e.getMessage());
+
+        if (goingOnline) {
+          stopServices();
+        }
 
         connected = !goingOnline;
       } finally {
@@ -112,6 +113,10 @@ public class ConnectionLifecycleManager {
 
   public void refreshDevices() {
     executor.submit(() -> {
+      if (!connected) {
+        return;
+      }
+
       scanner.stop();
       scanner.start();
     });
@@ -121,11 +126,14 @@ public class ConnectionLifecycleManager {
     executor.shutdown();
   }
 
-  private void notifyTransitionStarted(boolean goingOnline) {
-    if (connectionTransitionListener == null) {
-      return;
-    }
+  private void stopServices() {
+    scanner.stop();
+    broadcaster.stop();
+    networkManager.stop();
+    devices.clear();
+  }
 
+  private void notifyTransitionStarted(boolean goingOnline) {
     if (Platform.isFxApplicationThread()) {
       connectionTransitionListener.accept(goingOnline);
     } else {
@@ -134,10 +142,6 @@ public class ConnectionLifecycleManager {
   }
 
   private void notifyStateChanged() {
-    Platform.runLater(() -> {
-      if (connectionStateListener != null) {
-        connectionStateListener.accept(connected);
-      }
-    });
+    Platform.runLater(() -> connectionStateListener.accept(connected));
   }
 }

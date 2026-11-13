@@ -35,9 +35,8 @@ public class UpdateBanner extends HBox {
         "pairing-banner-accept",
         "update-banner-download");
     downloadBtn.setOnAction(e -> {
-      if (onDownload != null) {
-        onDownload.run();
-      }
+      onDownload.run();
+
       hide();
     });
 

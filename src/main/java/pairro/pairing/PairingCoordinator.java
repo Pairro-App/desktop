@@ -25,12 +25,13 @@ public class PairingCoordinator implements NetworkPairingListener {
   private DashboardEventListener eventListener;
 
   public PairingCoordinator(
-      PairingService pairingService,
-      ProtocolMessenger messenger,
-      DeviceDirectory devices,
-      NetworkManager networkManager,
-      String desktopId,
-      Supplier<String> desktopName) {
+    PairingService pairingService,
+    ProtocolMessenger messenger,
+    DeviceDirectory devices,
+    NetworkManager networkManager,
+    String desktopId,
+    Supplier<String> desktopName
+  ) {
     this.pairingService = pairingService;
     this.messenger = messenger;
     this.devices = devices;
@@ -45,23 +46,48 @@ public class PairingCoordinator implements NetworkPairingListener {
 
   @Override
   public void onPairRequest(
-      String deviceId,
-      String deviceName,
-      String clientPublicKeyStr,
-      ClientHandler client) {
+    String deviceId,
+    String deviceName,
+    String clientPublicKeyStr,
+    ClientHandler client
+  ) {
     String addressKey = client.getAddress().getHostAddress();
-    PairingService.Challenge challenge = pairingService.createChallenge(addressKey, clientPublicKeyStr);
+
+    if (deviceId == null || deviceName == null || clientPublicKeyStr == null)  {
+      rejectPairRequest(client, addressKey, "missing fields");
+
+      return;
+    }
+
+    PairingService.Challenge challenge;
+
+    try {
+      challenge = pairingService.createChallenge(addressKey, clientPublicKeyStr);
+    } catch (IllegalArgumentException exception) {
+      rejectPairRequest(client, addressKey, exception.getMessage());
+
+      return;
+    }
 
     messenger.sendPairChallenge(client, desktopId, desktopName.get(), challenge.desktopPublicKey);
     devices.addPendingClient(addressKey, client);
 
-    if (eventListener != null) {
-      eventListener.onPairRequest(deviceName, addressKey, challenge.pin, client, deviceId);
-    }
+    eventListener.onPairRequest(deviceName, addressKey, challenge.pin, client, deviceId);
+  }
+
+  private void rejectPairRequest(ClientHandler client, String addressKey, String reason) {
+    System.err.println("[Pairing] Rejected pair request from " + addressKey + ": " + reason);
+
+    messenger.sendPairDecision(client, false, "Invalid pairing request");
+    client.close();
   }
 
   @Override
-  public void onAuthInit(String deviceId, String clientNonce, ClientHandler client) {
+  public void onAuthInit(
+    String deviceId,
+    String clientNonce,
+    ClientHandler client
+  ) {
     Optional<PairedDeviceStore.PairedDevice> paired = deviceId == null
         ? Optional.empty()
         : pairingService.findPaired(deviceId);
@@ -74,10 +100,11 @@ public class PairingCoordinator implements NetworkPairingListener {
     }
 
     PendingAuth pending = new PendingAuth(
-        deviceId,
-        clientNonce,
-        AuthHandshake.newNonce(),
-        certificateFingerprint);
+      deviceId,
+      clientNonce,
+      AuthHandshake.newNonce(),
+      certificateFingerprint
+    );
 
     client.beginAuth(pending);
 
@@ -87,7 +114,10 @@ public class PairingCoordinator implements NetworkPairingListener {
   }
 
   @Override
-  public void onAuthProof(String clientProof, ClientHandler client) {
+  public void onAuthProof(
+    String clientProof,
+    ClientHandler client
+  ) {
     PendingAuth pending = client.takePendingAuth();
 
     Optional<PairedDeviceStore.PairedDevice> paired = pending == null
@@ -123,9 +153,7 @@ public class PairingCoordinator implements NetworkPairingListener {
 
     devices.addPendingClient(addressKey, client);
 
-    if (eventListener != null) {
-      eventListener.onConnectionConflict(existingConnected, deviceName, addressKey, deviceId, client);
-    }
+    eventListener.onConnectionConflict(existingConnected, deviceName, addressKey, deviceId, client);
   }
 
   private void rejectAuth(ClientHandler client) {
@@ -134,23 +162,30 @@ public class PairingCoordinator implements NetworkPairingListener {
   }
 
   public void resolveConnectionConflict(
-      ClientHandler client,
-      String addressKey,
-      String deviceId,
-      String deviceName,
-      boolean keepNew) {
+    ClientHandler client,
+    String addressKey,
+    String deviceId,
+    String deviceName,
+    boolean keepNew
+  ) {
     devices.removePendingClient(addressKey);
 
     if (keepNew) {
+      Optional<PairedDeviceStore.PairedDevice> paired = pairingService.findPaired(deviceId);
+
+      if (paired.isEmpty()) {
+        rejectAuth(client);
+
+        return;
+      }
+
       Device previouslyConnected = devices.getConnectedDevice();
 
       if (previouslyConnected != null) {
         devices.disconnectClient(previouslyConnected.getClientId());
       }
 
-      String token = pairingService.findPaired(deviceId).get().token();
-
-      completeConnection(client, addressKey, deviceId, deviceName, token);
+      completeConnection(client, addressKey, deviceId, deviceName, paired.get().token());
     } else {
       messenger.sendAuthResult(client, false, "Another device is already connected");
       client.close();
@@ -158,11 +193,12 @@ public class PairingCoordinator implements NetworkPairingListener {
   }
 
   public void handlePairingResponse(
-      ClientHandler client,
-      String addressKey,
-      String deviceId,
-      String deviceName,
-      boolean accepted) {
+    ClientHandler client,
+    String addressKey,
+    String deviceId,
+    String deviceName,
+    boolean accepted
+  ) {
     pairingService.discardChallenge(addressKey);
 
     if (accepted) {
@@ -217,11 +253,12 @@ public class PairingCoordinator implements NetworkPairingListener {
   }
 
   private void completeConnection(
-      ClientHandler client,
-      String addressKey,
-      String deviceId,
-      String deviceName,
-      String token) {
+    ClientHandler client,
+    String addressKey,
+    String deviceId,
+    String deviceName,
+    String token
+  ) {
     byte[] sessionKey = CryptoUtils.deriveKeyFromToken(token);
     networkManager.setUdpSessionKey(sessionKey);
     networkManager.setTrustedUdpAddress(client.getAddress());
@@ -235,14 +272,10 @@ public class PairingCoordinator implements NetworkPairingListener {
   }
 
   private void notifyDevicesChanged() {
-    if (eventListener != null) {
-      eventListener.onDeviceListUpdated(devices.getDevicesList());
-    }
+    eventListener.onDeviceListUpdated(devices.getDevicesList());
   }
 
   private void notifyConnectedDeviceChanged() {
-    if (eventListener != null) {
-      eventListener.onConnectedDeviceChanged(devices.getConnectedDevice());
-    }
+    eventListener.onConnectedDeviceChanged(devices.getConnectedDevice());
   }
 }

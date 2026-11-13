@@ -81,9 +81,9 @@ public class DevicesListPanel extends VBox {
     rowsBox.getChildren().clear();
 
     List<Device> paired = lastDevices.stream()
-        .filter(Device::isPaired)
-        .sorted(Comparator.comparing(d -> !isConnected(d)))
-        .toList();
+      .filter(Device::isPaired)
+      .sorted(Comparator.comparing(d -> !isConnected(d)))
+      .toList();
     List<Device> unpaired = lastDevices.stream().filter(d -> !d.isPaired()).toList();
 
     if (paired.isEmpty() && unpaired.isEmpty()) {

@@ -26,11 +26,7 @@ public class DeviceSearchBar extends HBox {
     field.getStyleClass().add("search-field");
     HBox.setHgrow(field, Priority.ALWAYS);
 
-    field.textProperty().addListener((obs, oldV, newV) -> {
-      if (onSearch != null) {
-        onSearch.accept(newV);
-      }
-    });
+    field.textProperty().addListener((obs, oldV, newV) -> onSearch.accept(newV));
 
     field.focusedProperty().addListener((obs, was, focused) -> {
       if (focused) {

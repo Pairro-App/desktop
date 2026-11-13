@@ -48,10 +48,6 @@ public class DeviceState {
   }
 
   public Device findByClientId(String clientId) {
-    if (clientId == null) {
-      return null;
-    }
-
     for (Device device : discoveredDevices.values()) {
       if (clientId.equals(device.getClientId())) {
         return device;

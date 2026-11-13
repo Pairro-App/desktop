@@ -122,9 +122,7 @@ public class DeviceRow extends HBox {
       disconnectBtn.setOnAction(e -> {
         e.consume();
 
-        if (onDisconnect != null) {
-          onDisconnect.run();
-        }
+        onDisconnect.run();
       });
 
       disconnectBtn.addEventFilter(MouseEvent.MOUSE_CLICKED, Event::consume);
@@ -217,8 +215,8 @@ public class DeviceRow extends HBox {
     long seconds = total % 60;
 
     timeLabel.setText(hours > 0
-        ? String.format("%d:%02d:%02d", hours, minutes, seconds)
-        : String.format("%02d:%02d", minutes, seconds));
+      ? String.format("%d:%02d:%02d", hours, minutes, seconds)
+      : String.format("%02d:%02d", minutes, seconds));
   }
 
   public Device getDevice() {

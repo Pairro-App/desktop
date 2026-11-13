@@ -116,39 +116,33 @@ public class InboundMessageRouter {
   }
 
   private void routePing(ClientHandler client) {
-    if (client != null && messenger != null) {
+    if (client != null) {
       messenger.sendPong(client);
     }
   }
 
   private void routePairRequest(Protocol.Envelope message, ClientHandler client) {
-    if (pairingListener != null) {
-      pairingListener.onPairRequest(
-          message.fields().get(Fields.DEVICE_ID),
-          message.fields().get(Fields.DEVICE_NAME),
-          message.fields().get(Fields.PUBLIC_KEY),
-          client);
-    }
+    pairingListener.onPairRequest(
+      message.fields().get(Fields.DEVICE_ID),
+      message.fields().get(Fields.DEVICE_NAME),
+      message.fields().get(Fields.PUBLIC_KEY),
+      client
+    );
   }
 
   private void routeAuthInit(Protocol.Envelope message, ClientHandler client) {
-    if (pairingListener != null) {
-      pairingListener.onAuthInit(
-          message.fields().get(Fields.DEVICE_ID),
-          message.fields().get(Fields.NONCE),
-          client);
-    }
+    pairingListener.onAuthInit(
+      message.fields().get(Fields.DEVICE_ID),
+      message.fields().get(Fields.NONCE),
+      client
+    );
   }
 
   private void routeAuthProof(Protocol.Envelope message, ClientHandler client) {
-    if (pairingListener != null) {
-      pairingListener.onAuthProof(message.fields().get(Fields.PROOF), client);
-    }
+    pairingListener.onAuthProof(message.fields().get(Fields.PROOF), client);
   }
 
   private void routeApplicationData(String data, ClientHandler client) {
-    if (dataListener != null) {
-      dataListener.onData(data, client);
-    }
+    dataListener.onData(data, client);
   }
 }

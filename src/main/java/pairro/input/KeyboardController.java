@@ -10,10 +10,6 @@ public class KeyboardController {
   }
 
   public void executeCombo(int[] keyCodes) {
-    if (this.robot == null || keyCodes == null || keyCodes.length == 0) {
-      return;
-    }
-
     int pressedCount = 0;
 
     try {

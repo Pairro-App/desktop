@@ -59,10 +59,6 @@ public class DeviceDirectory {
   }
 
   public void disconnectClient(String deviceId) {
-    if (deviceId == null) {
-      return;
-    }
-
     ClientHandler client = deviceState.getConnectedClient(deviceId);
 
     if (client != null) {
@@ -112,7 +108,7 @@ public class DeviceDirectory {
     pairingService.forget(device.getClientId());
     device.setPaired(false);
 
-    if (device.getClientId() != null && device.getClientId().equals(connectedDeviceId)) {
+    if (device.getClientId().equals(connectedDeviceId)) {
       disconnectClient(device.getClientId());
     }
   }

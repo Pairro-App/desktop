@@ -74,15 +74,8 @@ public class NetworkManager {
 
     System.out.println("[Network] Shutting down...");
 
-    if (this.tcpServer != null) {
-      this.tcpServer.shutdown();
-      this.tcpServer = null;
-    }
-
-    if (this.udpServer != null) {
-      this.udpServer.shutdown();
-      this.udpServer = null;
-    }
+    this.tcpServer.shutdown();
+    this.udpServer.shutdown();
 
     clearTrustedUdpAddress();
   }
@@ -104,8 +97,6 @@ public class NetworkManager {
       clearTrustedUdpAddress();
     }
 
-    if (this.pairingListener != null) {
-      this.pairingListener.onDisconnect(client);
-    }
+    this.pairingListener.onDisconnect(client);
   }
 }

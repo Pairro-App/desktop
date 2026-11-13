@@ -40,9 +40,8 @@ public class PairingBanner extends HBox {
         "pairing-banner-button pairing-banner-accept");
     ComponentFactory.setTooltip(acceptBtn, "Accept");
     acceptBtn.setOnAction(e -> {
-      if (onResponse != null) {
-        onResponse.accept(address, true);
-      }
+      onResponse.accept(address, true);
+
       hide();
     });
 
@@ -50,9 +49,8 @@ public class PairingBanner extends HBox {
         "pairing-banner-button pairing-banner-decline");
     ComponentFactory.setTooltip(declineBtn, "Decline");
     declineBtn.setOnAction(e -> {
-      if (onResponse != null) {
-        onResponse.accept(address, false);
-      }
+      onResponse.accept(address, false);
+
       hide();
     });
 
@@ -82,18 +80,16 @@ public class PairingBanner extends HBox {
         "pairing-banner-button pairing-banner-accept");
     ComponentFactory.setTooltip(switchBtn, "Switch to " + incomingDeviceName);
     switchBtn.setOnAction(e -> {
-      if (onResolved != null) {
-        onResolved.accept(true);
-      }
+      onResolved.accept(true);
+
       hide();
     });
 
     Button keepBtn = ComponentFactory.createIconButton(IconPaths.CLOSE, "pairing-banner-button pairing-banner-decline");
     ComponentFactory.setTooltip(keepBtn, "Keep " + connectedDeviceName);
     keepBtn.setOnAction(e -> {
-      if (onResolved != null) {
-        onResolved.accept(false);
-      }
+      onResolved.accept(false);
+
       hide();
     });
 

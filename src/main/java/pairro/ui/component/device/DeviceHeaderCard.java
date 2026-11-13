@@ -58,27 +58,15 @@ public class DeviceHeaderCard extends VBox {
     HBox.setHgrow(spacer, Priority.ALWAYS);
 
     powerBtn = ComponentFactory.createPowerToggle(connected);
-    powerBtn.setOnAction(e -> {
-      if (onToggleConnection != null) {
-        onToggleConnection.run();
-      }
-    });
+    powerBtn.setOnAction(e -> onToggleConnection.run());
 
     refreshBtn = ComponentFactory.createIconButton(IconPaths.REFRESH, "header-action-btn");
     ComponentFactory.setTooltip(refreshBtn, "Refresh devices");
-    refreshBtn.setOnAction(e -> {
-      if (onRefresh != null) {
-        onRefresh.run();
-      }
-    });
+    refreshBtn.setOnAction(e -> onRefresh.run());
 
     settingsBtn = ComponentFactory.createIconButton(IconPaths.SETTINGS, "header-action-btn");
     ComponentFactory.setTooltip(settingsBtn, "Settings");
-    settingsBtn.setOnAction(e -> {
-      if (onOpenSettings != null) {
-        onOpenSettings.run();
-      }
-    });
+    settingsBtn.setOnAction(e -> onOpenSettings.run());
 
     setConnected(connected);
 

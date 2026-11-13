@@ -27,9 +27,7 @@ public final class SettingsRows {
     row.setOnMouseClicked(e -> {
       toggle.toggle();
 
-      if (onToggle != null) {
-        onToggle.accept(toggle.isSelected());
-      }
+      onToggle.accept(toggle.isSelected());
     });
 
     return row;

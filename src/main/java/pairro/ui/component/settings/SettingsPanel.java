@@ -22,11 +22,7 @@ public class SettingsPanel extends VBox {
 
     Button backBtn = ComponentFactory.createIconButton(IconPaths.ARROW_BACK, "settings-back-brn");
     ComponentFactory.setTooltip(backBtn, "Back");
-    backBtn.setOnAction(e -> {
-      if (onBack != null) {
-        onBack.run();
-      }
-    });
+    backBtn.setOnAction(e -> onBack.run());
 
     Label title = new Label("Settings");
     title.getStyleClass().add("settings-title");

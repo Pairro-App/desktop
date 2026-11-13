@@ -23,12 +23,13 @@ public class DeviceBroadcaster {
       properties.put(Fields.DEVICE_TYPE, "desktop");
 
       ServiceInfo serviceInfo = ServiceInfo.create(
-          serviceType,
-          deviceName,
-          port,
-          0,
-          0,
-          properties);
+        serviceType,
+        deviceName,
+        port,
+        0,
+        0,
+        properties
+      );
 
       jmdns.registerService(serviceInfo);
     } catch (IOException exception) {

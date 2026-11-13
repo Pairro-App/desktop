@@ -10,7 +10,7 @@ public class UDPSessionState {
   private volatile UDPCrypto crypto;
 
   public void setSessionKey(byte[] keyBytes) {
-    this.crypto = keyBytes != null ? new UDPCrypto(keyBytes) : null;
+    this.crypto = new UDPCrypto(keyBytes);
   }
 
   public void setTrustedAddress(InetAddress address) {

@@ -34,10 +34,11 @@ public class CryptoUtils {
   public static PublicKey decodePublicKey(String base64Key) {
     try {
       byte[] keyBytes = Codec.fromBase64(base64Key);
+      KeyFactory keyFactory = KeyFactory.getInstance("EC");
 
-      return KeyFactory.getInstance("EC").generatePublic(new X509EncodedKeySpec(keyBytes));
+      return keyFactory.generatePublic(new X509EncodedKeySpec(keyBytes));
     } catch (GeneralSecurityException | IllegalArgumentException e) {
-      return null;
+      throw new IllegalArgumentException("Invalid public key", e);
     }
   }
 
@@ -49,7 +50,7 @@ public class CryptoUtils {
     try {
       return Codec.sha256Hex(certificate.getEncoded());
     } catch (GeneralSecurityException e) {
-      return null;
+      throw new IllegalStateException("Failed fingerprint", e);
     }
   }
 
