@@ -48,6 +48,7 @@ runtime {
   modules.set(listOf(
     "java.desktop",
     "java.prefs",
+    "java.net.http",
     "java.datatransfer",
     "java.naming",
     "java.logging",
@@ -62,6 +63,7 @@ runtime {
     installerType = "exe"
     imageOptions = listOf("--icon", "src/main/resources/icon.ico")
     installerOptions = listOf(
+      "--icon", "src/main/resources/icon.ico",
       "--vendor", "Pairro",
       "--app-version", project.version.toString(),
       "--win-menu",
