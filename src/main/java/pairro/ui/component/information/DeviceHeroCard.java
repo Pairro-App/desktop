@@ -24,12 +24,11 @@ public class DeviceHeroCard extends VBox {
 
     boolean connected = device.getStatus() == DeviceStatus.ONLINE;
     Label pairedBadge = device.isPaired()
-        ? ComponentFactory.createNeutralBadge("Paired")
-        : ComponentFactory.createStatusBadge("Not Paired", false);
+      ? ComponentFactory.createNeutralBadge("Paired")
+      : ComponentFactory.createStatusBadge("Not Paired", false);
 
     Label connectionBadge = ComponentFactory.createStatusBadge(
-        connected ? "Online" : "Offline",
-        connected);
+      connected ? "Online" : "Offline", connected);
 
     HBox badgeRow = new HBox(6, connectionBadge, pairedBadge);
     badgeRow.setAlignment(Pos.CENTER_LEFT);
@@ -44,8 +43,7 @@ public class DeviceHeroCard extends VBox {
     avatar.setPrefSize(40, 40);
     avatar.setMaxSize(40, 40);
 
-    avatar.getChildren().add(
-        IconFactory.createIcon(IconPaths.PHONE, "phone-icon"));
+    avatar.getChildren().add(IconFactory.createIcon(IconPaths.PHONE, "phone-icon"));
 
     HBox content = new HBox(12, avatar, textBox);
     content.setAlignment(Pos.CENTER_LEFT);

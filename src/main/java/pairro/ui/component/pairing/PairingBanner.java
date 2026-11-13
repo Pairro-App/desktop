@@ -23,7 +23,12 @@ public class PairingBanner extends HBox {
     hide();
   }
 
-  public void showRequest(String deviceName, String address, String pin, BiConsumer<String, Boolean> onResponse) {
+  public void showRequest(
+    String deviceName,
+    String address,
+    String pin,
+    BiConsumer<String, Boolean> onResponse
+  ) {
     Label nameLabel = new Label(deviceName);
     nameLabel.getStyleClass().add("pairing-banner-title");
 

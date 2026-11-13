@@ -1,5 +1,8 @@
 package pairro.notification;
 
 public interface NotificationPresenter {
-  void present(NotificationType type, String deviceName);
+  public void present(
+    NotificationType type,
+    String deviceName
+  );
 }

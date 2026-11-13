@@ -1,21 +1,29 @@
 package pairro.update;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.io.IOException;
 import java.net.URI;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 final class GitHubReleaseJsonParser {
-  private static final Pattern TAG = Pattern.compile("\"tag_name\"\\s*:\\s*\"([^\"]+)\"");
-  private static final Pattern URL = Pattern.compile(
-      "\"html_url\"\\s*:\\s*\"(https://github\\.com/[^\"]+/releases/tag/[^\"]+)\"");
+  private static final ObjectMapper MAPPER = new ObjectMapper();
+
+  private static final String RELEASE_URL_PREFIX = "https://github.com/";
+  private static final String RELEASE_URL_PATH = "/releases/tag/";
 
   Release parse(String json) throws IOException {
-    String tag = firstGroup(TAG, json);
-    String url = firstGroup(URL, json);
+    JsonNode root = MAPPER.readTree(json);
+
+    String tag = root.path("tag_name").textValue();
+    String url = root.path("html_url").textValue();
 
     if (tag == null || url == null) {
       throw new IOException("Unexpected GitHub response: missing tag_name or html_url");
+    }
+
+    if (!url.startsWith(RELEASE_URL_PREFIX) || !url.contains(RELEASE_URL_PATH)) {
+      throw new IOException("Unexpected release URL: " + url);
     }
 
     try {
@@ -23,11 +31,5 @@ final class GitHubReleaseJsonParser {
     } catch (IllegalArgumentException exception) {
       throw new IOException("Unusable release tag: " + tag, exception);
     }
-  }
-
-  private static String firstGroup(Pattern pattern, String text) {
-    Matcher matcher = pattern.matcher(text);
-
-    return matcher.find() ? matcher.group(1) : null;
   }
 }

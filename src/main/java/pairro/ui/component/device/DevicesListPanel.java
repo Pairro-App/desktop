@@ -31,15 +31,16 @@ public class DevicesListPanel extends VBox {
   private Instant connectedSince;
 
   public DevicesListPanel(
-      String deviceName,
-      boolean connected,
-      List<Device> devices,
-      Consumer<Device> onSelectDevice,
-      Consumer<Device> onUnpairDevice,
-      Runnable onToggleConnection,
-      Runnable onRefresh,
-      Runnable onDisconnect,
-      Runnable onOpenSettings) {
+    String deviceName,
+    boolean connected,
+    List<Device> devices,
+    Consumer<Device> onSelectDevice,
+    Consumer<Device> onUnpairDevice,
+    Runnable onToggleConnection,
+    Runnable onRefresh,
+    Runnable onDisconnect,
+    Runnable onOpenSettings
+  ) {
     super(0);
     this.onSelectDevice = onSelectDevice;
     this.onUnpairDevice = onUnpairDevice;

@@ -23,14 +23,25 @@ public class ToastNotifier implements NotificationPresenter {
   }
 
   @Override
-  public void present(NotificationType type, String deviceName) {
+  public void present(
+    NotificationType type,
+    String deviceName
+  ) {
     Platform.runLater(() -> show(type, deviceName));
   }
 
-  private void show(NotificationType type, String deviceName) {
+  private void show(
+    NotificationType type,
+    String deviceName
+  ) {
     dismissOldest();
 
-    ToastContent content = new ToastContent(type.title(), type.message(deviceName), ToastPalette.accentFor(type));
+    ToastContent content = new ToastContent(
+      type.title(),
+      type.message(deviceName),
+      ToastPalette.accentFor(type)
+    );
+
     ToastStage toast = new ToastStage(content, icon, onClick, this::remove);
 
     visibleToasts.add(toast);

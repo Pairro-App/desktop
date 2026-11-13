@@ -20,11 +20,12 @@ public class InboundMessageRouter {
   private NetworkDataListener dataListener;
 
   public InboundMessageRouter(
-      MouseInputHandler mouseInputHandler,
-      KeyboardInputHandler keyboardInputHandler,
-      AudioHandler audioHandler,
-      ClipboardHandler clipboardHandler,
-      ProtocolMessenger messenger) {
+    MouseInputHandler mouseInputHandler,
+    KeyboardInputHandler keyboardInputHandler,
+    AudioHandler audioHandler,
+    ClipboardHandler clipboardHandler,
+    ProtocolMessenger messenger
+  ) {
     this.mouseInputHandler = mouseInputHandler;
     this.keyboardInputHandler = keyboardInputHandler;
     this.audioHandler = audioHandler;
@@ -40,7 +41,10 @@ public class InboundMessageRouter {
     this.dataListener = listener;
   }
 
-  public void route(String data, ClientHandler client) {
+  public void route(
+    String data,
+    ClientHandler client
+  ) {
     if (data == null || data.isEmpty()) {
       return;
     }
@@ -85,7 +89,10 @@ public class InboundMessageRouter {
     }
   }
 
-  private void routeUnauthenticated(String data, ClientHandler client) {
+  private void routeUnauthenticated(
+    String data,
+    ClientHandler client
+  ) {
     Protocol.Envelope message = Protocol.decode(data);
 
     switch (message.type()) {
@@ -121,7 +128,10 @@ public class InboundMessageRouter {
     }
   }
 
-  private void routePairRequest(Protocol.Envelope message, ClientHandler client) {
+  private void routePairRequest(
+    Protocol.Envelope message,
+    ClientHandler client
+  ) {
     pairingListener.onPairRequest(
       message.fields().get(Fields.DEVICE_ID),
       message.fields().get(Fields.DEVICE_NAME),
@@ -130,7 +140,10 @@ public class InboundMessageRouter {
     );
   }
 
-  private void routeAuthInit(Protocol.Envelope message, ClientHandler client) {
+  private void routeAuthInit(
+    Protocol.Envelope message,
+    ClientHandler client
+  ) {
     pairingListener.onAuthInit(
       message.fields().get(Fields.DEVICE_ID),
       message.fields().get(Fields.NONCE),
@@ -138,7 +151,10 @@ public class InboundMessageRouter {
     );
   }
 
-  private void routeAuthProof(Protocol.Envelope message, ClientHandler client) {
+  private void routeAuthProof(
+    Protocol.Envelope message,
+    ClientHandler client
+  ) {
     pairingListener.onAuthProof(message.fields().get(Fields.PROOF), client);
   }
 

@@ -19,7 +19,10 @@ public class UpdateBanner extends HBox {
     hide();
   }
 
-  public void show(String message, Runnable onDownload) {
+  public void show(
+    String message,
+    Runnable onDownload
+  ) {
     Label titleLabel = new Label(message);
     titleLabel.getStyleClass().add("pairing-banner-title");
 

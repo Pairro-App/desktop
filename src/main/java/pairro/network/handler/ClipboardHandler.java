@@ -29,7 +29,10 @@ public class ClipboardHandler {
     this.clipboardMonitor.stop();
   }
 
-  public boolean handleCommand(String data, ClientHandler client) {
+  public boolean handleCommand(
+    String data,
+    ClientHandler client
+  ) {
     if (data == null || data.isEmpty()) {
       return false;
     }

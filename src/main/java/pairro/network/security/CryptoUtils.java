@@ -54,7 +54,10 @@ public class CryptoUtils {
     }
   }
 
-  public static String calculatePin(PrivateKey localPrivateKey, PublicKey remotePublicKey) {
+  public static String calculatePin(
+    PrivateKey localPrivateKey,
+    PublicKey remotePublicKey
+  ) {
     try {
       KeyAgreement agreement = KeyAgreement.getInstance("ECDH");
       agreement.init(localPrivateKey);

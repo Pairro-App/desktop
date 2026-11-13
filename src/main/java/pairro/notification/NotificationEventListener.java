@@ -12,21 +12,35 @@ public class NotificationEventListener implements DashboardEventListener {
   private final NotificationService notificationService;
   private String connectedDeviceName;
 
-  public NotificationEventListener(DashboardEventListener delegate, NotificationService notificationService) {
+  public NotificationEventListener(
+    DashboardEventListener delegate,
+    NotificationService notificationService
+  ) {
     this.delegate = delegate;
     this.notificationService = notificationService;
   }
 
   @Override
-  public void onPairRequest(String deviceName, String addressKey, String calculatedPin, ClientHandler client,
-      String deviceId) {
+  public void onPairRequest(
+    String deviceName,
+    String addressKey,
+    String calculatedPin,
+    ClientHandler client,
+    String deviceId
+  ) {
     delegate.onPairRequest(deviceName, addressKey, calculatedPin, client, deviceId);
+
     notificationService.publish(NotificationType.PAIRING_REQUEST, deviceName);
   }
 
   @Override
-  public void onConnectionConflict(Device connectedDevice, String incomingDeviceName, String addressKey,
-      String deviceId, ClientHandler client) {
+  public void onConnectionConflict(
+    Device connectedDevice,
+    String incomingDeviceName,
+    String addressKey,
+    String deviceId,
+    ClientHandler client
+  ) {
     delegate.onConnectionConflict(connectedDevice, incomingDeviceName, addressKey, deviceId, client);
   }
 

@@ -11,7 +11,10 @@ public class AudioHandler {
     this.audioController = audioController;
   }
 
-  public boolean handleCommand(String data, ClientHandler client) {
+  public boolean handleCommand(
+    String data,
+    ClientHandler client
+  ) {
     if (data == null || data.isEmpty() || audioController == null) {
       return false;
     }

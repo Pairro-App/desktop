@@ -25,7 +25,11 @@ public class ClientHandler extends Thread {
   private volatile boolean authenticated = false;
   private volatile PendingAuth pendingAuth;
 
-  public ClientHandler(Socket socket, NetworkManager manager, TCPServer server) {
+  public ClientHandler(
+    Socket socket,
+    NetworkManager manager,
+    TCPServer server
+  ) {
     this.socket = socket;
     this.manager = manager;
     this.server = server;

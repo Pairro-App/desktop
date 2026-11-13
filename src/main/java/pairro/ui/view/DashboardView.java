@@ -45,9 +45,10 @@ public class DashboardView implements DashboardEventListener {
   private final SettingsStore settingsStore;
 
   public DashboardView(
-      Stage ownerStage,
-      AppCoordinator controller,
-      SettingsStore settingsStore) {
+    Stage ownerStage,
+    AppCoordinator controller,
+    SettingsStore settingsStore
+  ) {
     this.controller = controller;
     this.settingsStore = settingsStore;
 
@@ -78,7 +79,10 @@ public class DashboardView implements DashboardEventListener {
     VBox.setMargin(updateBanner, new Insets(0, 12, 12, 12));
   }
 
-  public void showUpdateAvailable(String message, Runnable onDownload) {
+  public void showUpdateAvailable(
+    String message,
+    Runnable onDownload
+  ) {
     Platform.runLater(() -> updateBanner.show(message, onDownload));
   }
 
@@ -87,15 +91,16 @@ public class DashboardView implements DashboardEventListener {
     informationPanel.setVisible(false);
 
     devicesListPanel = new DevicesListPanel(
-        settingsStore.getDeviceName(),
-        controller.isConnected(),
-        controller.getDevicesList(),
-        this::onDeviceSelected,
-        controller::unpairDevice,
-        this::handleToggleConnection,
-        controller::refreshDevices,
-        controller::disconnectConnectedDevice,
-        this::openSettings);
+      settingsStore.getDeviceName(),
+      controller.isConnected(),
+      controller.getDevicesList(),
+      this::onDeviceSelected,
+      controller::unpairDevice,
+      this::handleToggleConnection,
+      controller::refreshDevices,
+      controller::disconnectConnectedDevice,
+      this::openSettings
+    );
 
     devicesListPanel.setConnectedDevice(controller.getConnectedDevice());
   }
@@ -215,11 +220,12 @@ public class DashboardView implements DashboardEventListener {
 
   @Override
   public void onPairRequest(
-      String deviceName,
-      String addressKey,
-      String calculatedPin,
-      ClientHandler client,
-      String deviceId) {
+    String deviceName,
+    String addressKey,
+    String calculatedPin,
+    ClientHandler client,
+    String deviceId
+  ) {
     Platform.runLater(() -> {
       pairingBanner.showRequest(deviceName, addressKey, calculatedPin, (address, accepted) -> {
         controller.handlePairingResponse(client, address, deviceId, deviceName, accepted);
@@ -229,11 +235,12 @@ public class DashboardView implements DashboardEventListener {
 
   @Override
   public void onConnectionConflict(
-      Device connectedDevice,
-      String incomingDeviceName,
-      String addressKey,
-      String deviceId,
-      ClientHandler client) {
+    Device connectedDevice,
+    String incomingDeviceName,
+    String addressKey,
+    String deviceId,
+    ClientHandler client
+  ) {
     Platform.runLater(() -> {
       pairingBanner.showConnectionConflict(connectedDevice.getName(), incomingDeviceName, keepNew -> {
         controller.resolveConnectionConflict(client, addressKey, deviceId, incomingDeviceName, keepNew);

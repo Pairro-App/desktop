@@ -3,11 +3,23 @@ package pairro.network;
 import pairro.network.server.ClientHandler;
 
 public interface NetworkPairingListener {
-  void onPairRequest(String deviceId, String deviceName, String publicKey, ClientHandler client);
+  public void onPairRequest(
+    String deviceId,
+    String deviceName,
+    String publicKey,
+    ClientHandler client
+  );
 
-  void onAuthInit(String deviceId, String clientNonce, ClientHandler client);
+  public void onAuthInit(
+    String deviceId,
+    String clientNonce,
+    ClientHandler client
+  );
 
-  void onAuthProof(String proof, ClientHandler client);
+  public void onAuthProof(
+    String proof,
+    ClientHandler client
+  );
 
-  void onDisconnect(ClientHandler client);
+  public void onDisconnect(ClientHandler client);
 }

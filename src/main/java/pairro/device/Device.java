@@ -11,7 +11,11 @@ public class Device {
   private boolean paired;
   private boolean connected;
 
-  public Device(String id, String name, String clientId) {
+  public Device(
+    String id,
+    String name,
+    String clientId
+  ) {
     this.id = id;
     this.name = name;
     this.clientId = clientId;

@@ -6,7 +6,10 @@ public final class Version implements Comparable<Version> {
   private final String text;
   private final int[] parts;
 
-  private Version(String text, int[] parts) {
+  private Version(
+    String text,
+    int[] parts
+  ) {
     this.text = text;
     this.parts = parts;
   }

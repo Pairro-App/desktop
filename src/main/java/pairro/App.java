@@ -155,7 +155,8 @@ public class App extends Application {
       keyboardInputHandler,
       audioHandler,
       clipboardHandler,
-      messenger);
+      messenger
+    );
     UDPSessionState udpSession = new UDPSessionState();
 
     NetworkManager networkManager = new NetworkManager(TCP_PORT, UDP_PORT, messageRouter, udpSession);
@@ -165,7 +166,8 @@ public class App extends Application {
       devices,
       networkManager,
       identity.getId(),
-      settingsStore::getDeviceName);
+      settingsStore::getDeviceName
+    );
 
     AppCoordinator controller = new AppCoordinator(pairing, devices);
 
@@ -183,20 +185,22 @@ public class App extends Application {
       devices,
       TCP_PORT,
       identity.getId(),
-      settingsStore::getDeviceName);
+      settingsStore::getDeviceName
+    );
 
     controller.setConnectionLifecycle(connectionLifecycle);
 
     AppVersion.current().ifPresentOrElse(
-        version -> controller.setUpdateScheduler(new UpdateScheduler(
-            new UpdateChecker(
-                new GitHubReleaseProvider(GitHubReleaseProvider.defaultHttpClient(), GITHUB_OWNER, GITHUB_REPO),
-                version,
-                settingsStore),
-            UPDATE_INITIAL_DELAY,
-            UPDATE_INTERVAL,
-            controller::onUpdateAvailable)),
-        () -> System.err.println("[App] App version unknown, update checks disabled"));
+      version -> controller.setUpdateScheduler(new UpdateScheduler(
+        new UpdateChecker(
+          new GitHubReleaseProvider(
+            GitHubReleaseProvider.defaultHttpClient(), GITHUB_OWNER, GITHUB_REPO),
+            version,
+            settingsStore),
+        UPDATE_INITIAL_DELAY,
+        UPDATE_INTERVAL,
+        controller::onUpdateAvailable)
+      ), () -> System.err.println("[App] App version unknown, update checks disabled"));
 
     networkManager.setPairingListener(new NetworkPairingListener() {
       @Override
@@ -204,7 +208,8 @@ public class App extends Application {
         String deviceId,
         String deviceName,
         String publicKey,
-        ClientHandler client) {
+        ClientHandler client
+      ) {
         pairing.onPairRequest(deviceId, deviceName, publicKey, client);
       }
 
@@ -212,20 +217,23 @@ public class App extends Application {
       public void onAuthInit(
         String deviceId,
         String clientNonce,
-        ClientHandler client) {
+        ClientHandler client
+      ) {
         pairing.onAuthInit(deviceId, clientNonce, client);
       }
 
       @Override
       public void onAuthProof(
         String proof,
-        ClientHandler client) {
+        ClientHandler client
+      ) {
         pairing.onAuthProof(proof, client);
       }
 
       @Override
       public void onDisconnect(
-        ClientHandler client) {
+        ClientHandler client
+      ) {
         pairing.onDisconnect(client);
       }
     });

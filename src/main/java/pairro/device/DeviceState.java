@@ -13,7 +13,11 @@ public class DeviceState {
   private final Map<String, ClientHandler> pendingClients = new LinkedHashMap<>();
   private final Map<String, ClientHandler> connectedClients = new LinkedHashMap<>();
 
-  public Device upsertDevice(String address, String name, String clientId) {
+  public Device upsertDevice(
+    String address,
+    String name,
+    String clientId
+  ) {
     Device device = discoveredDevices.get(address);
 
     if (device == null) {
@@ -31,7 +35,10 @@ public class DeviceState {
     return device;
   }
 
-  public void addPendingClient(String address, ClientHandler client) {
+  public void addPendingClient(
+    String address,
+    ClientHandler client
+  ) {
     pendingClients.put(address, client);
   }
 
@@ -57,7 +64,10 @@ public class DeviceState {
     return null;
   }
 
-  public void setConnectedClient(String deviceId, ClientHandler client) {
+  public void setConnectedClient(
+    String deviceId,
+    ClientHandler client
+  ) {
     connectedClients.put(deviceId, client);
   }
 

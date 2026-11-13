@@ -37,11 +37,12 @@ public class DeviceRow extends HBox {
   private boolean confirming = false;
 
   public DeviceRow(
-      Device device,
-      Instant connectedSince,
-      Consumer<Device> onSelect,
-      Consumer<Device> onUnpair,
-      Runnable onDisconnect) {
+    Device device,
+    Instant connectedSince,
+    Consumer<Device> onSelect,
+    Consumer<Device> onUnpair,
+    Runnable onDisconnect
+  ) {
     this.device = device;
     boolean connected = connectedSince != null;
 

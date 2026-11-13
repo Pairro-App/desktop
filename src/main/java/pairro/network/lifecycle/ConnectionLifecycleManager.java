@@ -34,13 +34,14 @@ public class ConnectionLifecycleManager {
   private Consumer<Boolean> connectionTransitionListener;
 
   public ConnectionLifecycleManager(
-      DeviceBroadcaster broadcaster,
-      DeviceScanner scanner,
-      NetworkManager networkManager,
-      DeviceDirectory devices,
-      int tcpPort,
-      String desktopId,
-      Supplier<String> deviceName) {
+    DeviceBroadcaster broadcaster,
+    DeviceScanner scanner,
+    NetworkManager networkManager,
+    DeviceDirectory devices,
+    int tcpPort,
+    String desktopId,
+    Supplier<String> deviceName
+  ) {
     this.broadcaster = broadcaster;
     this.scanner = scanner;
     this.networkManager = networkManager;

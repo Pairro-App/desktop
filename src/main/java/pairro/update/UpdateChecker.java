@@ -10,7 +10,11 @@ public final class UpdateChecker {
   private final Version currentVersion;
   private final SettingsStore settingsStore;
 
-  public UpdateChecker(ReleaseProvider provider, Version currentVersion, SettingsStore settingsStore) {
+  public UpdateChecker(
+    ReleaseProvider provider,
+    Version currentVersion,
+    SettingsStore settingsStore
+  ) {
     this.provider = provider;
     this.currentVersion = currentVersion;
     this.settingsStore = settingsStore;

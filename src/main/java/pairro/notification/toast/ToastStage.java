@@ -26,7 +26,11 @@ public final class ToastStage {
   private double targetY;
   private boolean dismissed;
 
-  public ToastStage(ToastContent content, Image icon, Runnable onClick, Consumer<ToastStage> onClosed) {
+  public ToastStage(
+    ToastContent content,
+    Image icon, Runnable onClick,
+    Consumer<ToastStage> onClosed
+  ) {
     this.onClosed = onClosed;
     this.stage = new Stage(StageStyle.TRANSPARENT);
 
@@ -49,11 +53,13 @@ public final class ToastStage {
     stage.yProperty().addListener(positionPin);
 
     fadeInTimeline = new Timeline(
-        new KeyFrame(FADE_IN_DURATION, new KeyValue(stage.opacityProperty(), 1.0))
+      new KeyFrame(FADE_IN_DURATION, new KeyValue(stage.opacityProperty(), 1.0))
     );
+
     countdownTimeline = new Timeline(
-        new KeyFrame(VISIBLE_DURATION, new KeyValue(pane.progressWidthProperty(), 0.0))
+      new KeyFrame(VISIBLE_DURATION, new KeyValue(pane.progressWidthProperty(), 0.0))
     );
+
     countdownTimeline.setOnFinished(event -> dismiss());
   }
 
@@ -92,12 +98,14 @@ public final class ToastStage {
     fadeInTimeline.stop();
 
     Timeline fadeOutTimeline = new Timeline(
-        new KeyFrame(FADE_OUT_DURATION, new KeyValue(stage.opacityProperty(), 0.0))
+      new KeyFrame(FADE_OUT_DURATION, new KeyValue(stage.opacityProperty(), 0.0))
     );
+
     fadeOutTimeline.setOnFinished(event -> {
       stage.close();
       onClosed.accept(this);
     });
+
     fadeOutTimeline.play();
   }
 }

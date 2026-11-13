@@ -26,7 +26,10 @@ public class TrayManager {
   private final SettingsStore settingsStore;
   private TrayIcon trayIcon;
 
-  public TrayManager(Stage stage, SettingsStore settingsStore) {
+  public TrayManager(
+    Stage stage,
+    SettingsStore settingsStore
+  ) {
     this.stage = stage;
     this.settingsStore = settingsStore;
   }

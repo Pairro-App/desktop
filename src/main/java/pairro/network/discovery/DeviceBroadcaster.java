@@ -14,7 +14,11 @@ public class DeviceBroadcaster {
   private JmDNS jmdns;
   private final String serviceType = "_pairro._tcp.local.";
 
-  public void start(String deviceName, int port, String deviceId) {
+  public void start(
+    String deviceName,
+    int port,
+    String deviceId
+  ) {
     try {
       jmdns = JmDNS.create(InetAddress.getLocalHost());
 

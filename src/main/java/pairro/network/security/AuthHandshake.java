@@ -17,8 +17,6 @@ public final class AuthHandshake {
   private static final int NONCE_BYTES = 32;
   private static final SecureRandom RANDOM = new SecureRandom();
 
-  private AuthHandshake() {}
-
   public static String newNonce() {
     byte[] nonce = new byte[NONCE_BYTES];
     RANDOM.nextBytes(nonce);
@@ -38,7 +36,11 @@ public final class AuthHandshake {
     }
   }
 
-  public static String proof(String token, String role, PendingAuth auth) {
+  public static String proof(
+    String token,
+    String role,
+    PendingAuth auth
+  ) {
     try {
       Mac mac = Mac.getInstance(HMAC_ALGORITHM);
       mac.init(new SecretKeySpec(token.getBytes(StandardCharsets.UTF_8), HMAC_ALGORITHM));
@@ -57,7 +59,10 @@ public final class AuthHandshake {
     }
   }
 
-  public static boolean matches(String expected, String actual) {
+  public static boolean matches(
+    String expected,
+    String actual
+  ) {
     if (expected == null || actual == null) {
       return false;
     }

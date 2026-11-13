@@ -3,14 +3,21 @@ package pairro.store;
 import java.util.Optional;
 
 public class PairedDeviceStore extends BaseStore {
-  public record PairedDevice(String deviceId, String deviceName, String token) {
-  }
+  public record PairedDevice(
+    String deviceId,
+    String deviceName,
+    String token
+  ) {}
 
   public PairedDeviceStore() {
     super("paired_devices.properties");
   }
 
-  public synchronized void save(String deviceId, String deviceName, String token) {
+  public synchronized void save(
+    String deviceId,
+    String deviceName,
+    String token
+  ) {
     this.props.setProperty(deviceId + ".name", deviceName);
     this.props.setProperty(deviceId + ".token", token);
 

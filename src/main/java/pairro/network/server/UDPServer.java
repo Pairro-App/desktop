@@ -12,7 +12,10 @@ public class UDPServer extends Thread {
   private boolean isRunning;
   private final NetworkManager manager;
 
-  public UDPServer(NetworkManager manager, int port) {
+  public UDPServer(
+    NetworkManager manager,
+    int port
+  ) {
     this.manager = manager;
     this.port = port;
     this.isRunning = true;

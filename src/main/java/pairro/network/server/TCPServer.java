@@ -27,7 +27,10 @@ public class TCPServer extends Thread {
   private final NetworkManager manager;
   private final List<ClientHandler> clients = Collections.synchronizedList(new ArrayList<>());
 
-  public TCPServer(NetworkManager manager, int port) {
+  public TCPServer(
+    NetworkManager manager,
+    int port
+  ) {
     this.manager = manager;
     this.port = port;
   }

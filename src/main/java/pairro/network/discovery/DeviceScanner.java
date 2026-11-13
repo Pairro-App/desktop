@@ -21,7 +21,10 @@ public class DeviceScanner {
   private final String serviceType = "_pairro._tcp.local.";
   private final DeviceDiscoveredListener onDeviceDiscovered;
 
-  public DeviceScanner(DeviceDiscoveredListener onDeviceDiscovered, String deviceId) {
+  public DeviceScanner(
+    DeviceDiscoveredListener onDeviceDiscovered,
+    String deviceId
+  ) {
     this.onDeviceDiscovered = onDeviceDiscovered;
     this.deviceId = deviceId;
   }

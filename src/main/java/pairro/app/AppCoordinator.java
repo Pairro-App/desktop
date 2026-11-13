@@ -23,8 +23,9 @@ public class AppCoordinator {
   private volatile Consumer<Release> updateListener;
 
   public AppCoordinator(
-      PairingCoordinator pairing,
-      DeviceDirectory devices) {
+    PairingCoordinator pairing,
+    DeviceDirectory devices
+  ) {
     this.pairing = pairing;
     this.devices = devices;
   }
@@ -85,20 +86,22 @@ public class AppCoordinator {
   }
 
   public void handlePairingResponse(
-      ClientHandler client,
-      String addressKey,
-      String deviceId,
-      String deviceName,
-      boolean accepted) {
+    ClientHandler client,
+    String addressKey,
+    String deviceId,
+    String deviceName,
+    boolean accepted
+  ) {
     this.pairing.handlePairingResponse(client, addressKey, deviceId, deviceName, accepted);
   }
 
   public void resolveConnectionConflict(
-      ClientHandler client,
-      String addressKey,
-      String deviceId,
-      String deviceName,
-      boolean keepNew) {
+    ClientHandler client,
+    String addressKey,
+    String deviceId,
+    String deviceName,
+    boolean keepNew
+  ) {
     this.pairing.resolveConnectionConflict(client, addressKey, deviceId, deviceName, keepNew);
   }
 
@@ -107,17 +110,19 @@ public class AppCoordinator {
   }
 
   public void onDeviceDiscovered(
-      String id,
-      String name,
-      String address) {
+    String id,
+    String name,
+    String address
+  ) {
     this.devices.upsertDiscovered(address, name, id);
 
     notifyDevicesChanged();
   }
 
   public void onDataReceived(
-      String data,
-      ClientHandler client) {
+    String data,
+    ClientHandler client
+  ) {
     String hostAddress = null;
 
     if (client != null) {

@@ -26,11 +26,12 @@ public class DeviceHeaderCard extends VBox {
   private boolean lastConnected = false;
 
   public DeviceHeaderCard(
-      String deviceName,
-      boolean connected,
-      Runnable onToggleConnection,
-      Runnable onRefresh,
-      Runnable onOpenSettings) {
+    String deviceName,
+    boolean connected,
+    Runnable onToggleConnection,
+    Runnable onRefresh,
+    Runnable onOpenSettings
+  ) {
     super(0);
     getStyleClass().add("header-card");
 
@@ -48,8 +49,7 @@ public class DeviceHeaderCard extends VBox {
     avatar.setPrefSize(40, 40);
     avatar.setMaxSize(40, 40);
 
-    avatar.getChildren().add(
-        IconFactory.createIcon(IconPaths.DESKTOP, "desktop-icon"));
+    avatar.getChildren().add(IconFactory.createIcon(IconPaths.DESKTOP, "desktop-icon"));
 
     HBox deviceDetails = new HBox(10, avatar, textBox);
     deviceDetails.setAlignment(Pos.CENTER_LEFT);

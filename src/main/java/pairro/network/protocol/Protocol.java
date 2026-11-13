@@ -6,13 +6,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Map;
 
 public class Protocol {
-
   private static final ObjectMapper MAPPER = new ObjectMapper().configure(
     DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
     false
   );
 
-  public record Envelope(String type, Map<String, String> fields) {
+  public record Envelope(
+    String type,
+    Map<String, String> fields
+  ) {
     public Envelope {
       if (type == null) {
         type = "";
@@ -30,7 +32,10 @@ public class Protocol {
     return encode(type, Map.of());
   }
 
-  public static String encode(String type, Map<String, String> fields) {
+  public static String encode(
+    String type,
+    Map<String, String> fields
+  ) {
     try {
       return MAPPER.writeValueAsString(new Envelope(type, fields));
     } catch (JsonProcessingException e) {

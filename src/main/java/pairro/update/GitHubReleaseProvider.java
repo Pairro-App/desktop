@@ -17,7 +17,11 @@ public final class GitHubReleaseProvider implements ReleaseProvider {
   private String etag;
   private Release cached;
 
-  public GitHubReleaseProvider(HttpClient http, String owner, String repo) {
+  public GitHubReleaseProvider(
+    HttpClient http,
+    String owner,
+    String repo
+  ) {
     this.http = http;
     this.endpoint = URI.create("https://api.github.com/repos/" + owner + "/" + repo + "/releases/latest");
     this.userAgent = repo + "-update-checker";
