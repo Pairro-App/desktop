@@ -15,6 +15,7 @@ dependencies {
   testImplementation("org.junit.jupiter:junit-jupiter:5.10.2")
   implementation("org.jmdns:jmdns:3.6.3")
   implementation("org.bouncycastle:bcpkix-jdk18on:1.78.1")
+  implementation("com.fasterxml.jackson.core:jackson-databind:2.18.5")
 }
 
 javafx {
@@ -54,6 +55,7 @@ runtime {
     "java.logging",
     "java.scripting",
     "java.xml",
+    "java.sql",
     "jdk.unsupported",
     "jdk.crypto.ec"
   ))
