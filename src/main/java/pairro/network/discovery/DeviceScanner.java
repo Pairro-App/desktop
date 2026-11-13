@@ -11,6 +11,8 @@ import javax.jmdns.JmDNS;
 import javax.jmdns.ServiceEvent;
 import javax.jmdns.ServiceListener;
 
+import pairro.network.protocol.Fields;
+
 public class DeviceScanner {
   private JmDNS jmdns;
   private ServiceListener listener;
@@ -53,8 +55,8 @@ public class DeviceScanner {
         public void serviceResolved(ServiceEvent event) {
           String name = event.getName();
           String address = event.getInfo().getHostAddresses()[0];
-          String id = event.getInfo().getPropertyString("device_id");
-          String type = event.getInfo().getPropertyString("device_type");
+          String id = event.getInfo().getPropertyString(Fields.DEVICE_ID);
+          String type = event.getInfo().getPropertyString(Fields.DEVICE_TYPE);
 
           if (!isIPv4(address)) {
             return;
@@ -67,7 +69,6 @@ public class DeviceScanner {
           if (id.equals(deviceId)) {
             return;
           }
-
 
           onDeviceDiscovered.onDiscovered(id, name, address);
         }

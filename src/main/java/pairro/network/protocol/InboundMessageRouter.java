@@ -1,5 +1,6 @@
 package pairro.network.protocol;
 
+import pairro.network.Commands;
 import pairro.network.NetworkDataListener;
 import pairro.network.NetworkPairingListener;
 import pairro.network.handler.AudioHandler;
@@ -69,11 +70,11 @@ public class InboundMessageRouter {
     Protocol.Decoded decoded = Protocol.decode(data);
 
     switch (decoded.type) {
-      case "PAIR_REQUEST": {
+      case Commands.Pair.REQUEST: {
         routePairRequest(decoded, client);
         break;
       }
-      case "PING": {
+      case Commands.System.PING: {
         routePing(client);
         break;
       }
@@ -88,19 +89,19 @@ public class InboundMessageRouter {
     Protocol.Decoded decoded = Protocol.decode(data);
 
     switch (decoded.type) {
-      case "PAIR_REQUEST": {
+      case Commands.Pair.REQUEST: {
         routePairRequest(decoded, client);
         break;
       }
-      case "AUTH_INIT": {
+      case Commands.Auth.INIT: {
         routeAuthInit(decoded, client);
         break;
       }
-      case "AUTH_PROOF": {
+      case Commands.Auth.PROOF: {
         routeAuthProof(decoded, client);
         break;
       }
-      case "PING": {
+      case Commands.System.PING: {
         routePing(client);
         break;
       }
@@ -123,9 +124,9 @@ public class InboundMessageRouter {
   private void routePairRequest(Protocol.Decoded decoded, ClientHandler client) {
     if (pairingListener != null) {
       pairingListener.onPairRequest(
-          decoded.fields.get("deviceId"),
-          decoded.fields.get("deviceName"),
-          decoded.fields.get("publicKey"),
+          decoded.fields.get(Fields.DEVICE_ID),
+          decoded.fields.get(Fields.DEVICE_NAME),
+          decoded.fields.get(Fields.PUBLIC_KEY),
           client);
     }
   }
@@ -133,15 +134,15 @@ public class InboundMessageRouter {
   private void routeAuthInit(Protocol.Decoded decoded, ClientHandler client) {
     if (pairingListener != null) {
       pairingListener.onAuthInit(
-        decoded.fields.get("deviceId"),
-        decoded.fields.get("nonce"),
+        decoded.fields.get(Fields.DEVICE_ID),
+        decoded.fields.get(Fields.NONCE),
         client);
     }
   }
 
   private void routeAuthProof(Protocol.Decoded decoded, ClientHandler client) {
     if (pairingListener != null) {
-      pairingListener.onAuthProof(decoded.fields.get("proof"), client);
+      pairingListener.onAuthProof(decoded.fields.get(Fields.PROOF), client);
     }
   }
 
