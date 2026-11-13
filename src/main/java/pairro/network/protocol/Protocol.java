@@ -1,53 +1,52 @@
 package pairro.network.protocol;
 
-import java.util.LinkedHashMap;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Map;
 
 public class Protocol {
-  private static final String FIELD_SEP_REGEX = "\\|";
-  private static final String FIELD_SEP_RAW = "|";
-  private static final String KV_SEP = "=";
 
-  public static String encode(String type, Map<String, String> fields) {
-    StringBuilder sb = new StringBuilder(type);
+  private static final ObjectMapper MAPPER = new ObjectMapper().configure(
+    DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
+    false
+  );
 
-    for (Map.Entry<String, String> e : fields.entrySet()) {
-      sb.append(FIELD_SEP_RAW).append(e.getKey()).append(KV_SEP).append(escape(e.getValue()));
-    }
+  public record Envelope(String type, Map<String, String> fields) {
+    public Envelope {
+      if (type == null) {
+        type = "";
+      }
 
-    return sb.toString();
-  }
-
-  public static class Decoded {
-    public final String type;
-    public final Map<String, String> fields;
-
-    Decoded(String type, Map<String, String> fields) {
-      this.type = type;
-      this.fields = fields;
-    }
-  }
-
-  public static Decoded decode(String message) {
-    String[] parts = message.split(FIELD_SEP_REGEX);
-    Map<String, String> fields = new LinkedHashMap<>();
-
-    for (int i = 1; i < parts.length; i++) {
-      int idx = parts[i].indexOf(KV_SEP);
-
-      if (idx >= 0) {
-        fields.put(parts[i].substring(0, idx), unescape(parts[i].substring(idx + 1)));
+      if (fields == null) {
+        fields = Map.of();
       }
     }
-
-    return new Decoded(parts.length > 0 ? parts[0] : "", fields);
   }
 
-  private static String escape(String value) {
-    return value.replace("\\", "\\\\").replace("|", "\\p").replace("\n", "\\n");
+  private static final Envelope EMPTY = new Envelope("", Map.of());
+
+  public static String encode(String type) {
+    return encode(type, Map.of());
   }
 
-  private static String unescape(String value) {
-    return value.replace("\\n", "\n").replace("\\p", "|").replace("\\\\", "\\");
+  public static String encode(String type, Map<String, String> fields) {
+    try {
+      return MAPPER.writeValueAsString(new Envelope(type, fields));
+    } catch (JsonProcessingException e) {
+      throw new IllegalStateException("Failed to encode message: " + type, e);
+    }
+  }
+
+  public static Envelope decode(String message) {
+    if (message == null) {
+      return EMPTY;
+    }
+
+    try {
+      return MAPPER.readValue(message, Envelope.class);
+    } catch (JsonProcessingException e) {
+      return EMPTY;
+    }
   }
 }

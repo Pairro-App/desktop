@@ -1,18 +1,15 @@
 package pairro.network.security;
 
 import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
-import java.security.MessageDigest;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.Certificate;
 import java.security.spec.ECGenParameterSpec;
 import java.security.spec.X509EncodedKeySpec;
-import java.util.Base64;
 
 import javax.crypto.KeyAgreement;
 
@@ -21,55 +18,36 @@ public class CryptoUtils {
   public static KeyPair generateKeyPair() {
     try {
       KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("EC");
-      ECGenParameterSpec ecSpec = new ECGenParameterSpec("secp256r1");
 
-      keyPairGenerator.initialize(ecSpec);
+      keyPairGenerator.initialize(new ECGenParameterSpec("secp256r1"));
 
       return keyPairGenerator.generateKeyPair();
-    } catch (Exception e) {
-      e.printStackTrace();
-
-      return null;
+    } catch (GeneralSecurityException e) {
+      throw new IllegalStateException("Could not generate key pair", e);
     }
   }
 
   public static byte[] deriveKeyFromToken(String token) {
-    try {
-      MessageDigest digest = MessageDigest.getInstance("SHA-256");
-      return digest.digest(token.getBytes(StandardCharsets.UTF_8));
-    } catch (Exception e) {
-      e.printStackTrace();
-      return new byte[32];
-    }
+    return Codec.sha256(token);
   }
 
   public static PublicKey decodePublicKey(String base64Key) {
     try {
-      byte[] keyBytes = Base64.getDecoder().decode(base64Key);
+      byte[] keyBytes = Codec.fromBase64(base64Key);
 
-      KeyFactory keyFactory = KeyFactory.getInstance("EC");
-
-      return keyFactory.generatePublic(new X509EncodedKeySpec(keyBytes));
-    } catch (Exception e) {
-      e.printStackTrace();
+      return KeyFactory.getInstance("EC").generatePublic(new X509EncodedKeySpec(keyBytes));
+    } catch (GeneralSecurityException | IllegalArgumentException e) {
       return null;
     }
   }
 
   public static String encodePublicKey(PublicKey publicKey) {
-    return Base64.getEncoder().encodeToString(publicKey.getEncoded());
+    return Codec.toBase64(publicKey.getEncoded());
   }
 
   public static String fingerprint(Certificate certificate) {
     try {
-      byte[] digest = MessageDigest.getInstance("SHA-256").digest(certificate.getEncoded());
-      StringBuilder hex = new StringBuilder(digest.length * 2);
-
-      for (byte value : digest) {
-        hex.append(String.format("%02x", value));
-      }
-
-      return hex.toString();
+      return Codec.sha256Hex(certificate.getEncoded());
     } catch (GeneralSecurityException e) {
       return null;
     }
@@ -81,19 +59,14 @@ public class CryptoUtils {
       agreement.init(localPrivateKey);
       agreement.doPhase(remotePublicKey, true);
 
-      byte[] sharedSecret = agreement.generateSecret();
-
-      MessageDigest digest = MessageDigest.getInstance("SHA-256");
-
-      byte[] hash = digest.digest(sharedSecret);
+      byte[] hash = Codec.sha256(agreement.generateSecret());
 
       int positiveHash = ByteBuffer.wrap(hash).getInt() & 0x7FFFFFFF;
       int pinNumber = positiveHash % 1000000;
 
       return String.format("%06d", pinNumber);
-    } catch (Exception e) {
-      e.printStackTrace();
-      return "000000";
+    } catch (GeneralSecurityException e) {
+      throw new IllegalStateException("Could not compute pairing PIN", e);
     }
   }
 }

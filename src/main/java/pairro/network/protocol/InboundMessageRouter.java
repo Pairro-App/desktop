@@ -67,11 +67,11 @@ public class InboundMessageRouter {
       return;
     }
 
-    Protocol.Decoded decoded = Protocol.decode(data);
+    Protocol.Envelope message = Protocol.decode(data);
 
-    switch (decoded.type) {
+    switch (message.type()) {
       case Commands.Pair.REQUEST: {
-        routePairRequest(decoded, client);
+        routePairRequest(message, client);
         break;
       }
       case Commands.System.PING: {
@@ -86,19 +86,19 @@ public class InboundMessageRouter {
   }
 
   private void routeUnauthenticated(String data, ClientHandler client) {
-    Protocol.Decoded decoded = Protocol.decode(data);
+    Protocol.Envelope message = Protocol.decode(data);
 
-    switch (decoded.type) {
+    switch (message.type()) {
       case Commands.Pair.REQUEST: {
-        routePairRequest(decoded, client);
+        routePairRequest(message, client);
         break;
       }
       case Commands.Auth.INIT: {
-        routeAuthInit(decoded, client);
+        routeAuthInit(message, client);
         break;
       }
       case Commands.Auth.PROOF: {
-        routeAuthProof(decoded, client);
+        routeAuthProof(message, client);
         break;
       }
       case Commands.System.PING: {
@@ -121,28 +121,28 @@ public class InboundMessageRouter {
     }
   }
 
-  private void routePairRequest(Protocol.Decoded decoded, ClientHandler client) {
+  private void routePairRequest(Protocol.Envelope message, ClientHandler client) {
     if (pairingListener != null) {
       pairingListener.onPairRequest(
-          decoded.fields.get(Fields.DEVICE_ID),
-          decoded.fields.get(Fields.DEVICE_NAME),
-          decoded.fields.get(Fields.PUBLIC_KEY),
+          message.fields().get(Fields.DEVICE_ID),
+          message.fields().get(Fields.DEVICE_NAME),
+          message.fields().get(Fields.PUBLIC_KEY),
           client);
     }
   }
 
-  private void routeAuthInit(Protocol.Decoded decoded, ClientHandler client) {
+  private void routeAuthInit(Protocol.Envelope message, ClientHandler client) {
     if (pairingListener != null) {
       pairingListener.onAuthInit(
-        decoded.fields.get(Fields.DEVICE_ID),
-        decoded.fields.get(Fields.NONCE),
-        client);
+          message.fields().get(Fields.DEVICE_ID),
+          message.fields().get(Fields.NONCE),
+          client);
     }
   }
 
-  private void routeAuthProof(Protocol.Decoded decoded, ClientHandler client) {
+  private void routeAuthProof(Protocol.Envelope message, ClientHandler client) {
     if (pairingListener != null) {
-      pairingListener.onAuthProof(decoded.fields.get(Fields.PROOF), client);
+      pairingListener.onAuthProof(message.fields().get(Fields.PROOF), client);
     }
   }
 

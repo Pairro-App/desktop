@@ -7,6 +7,7 @@ import pairro.clipboard.ClipboardController;
 import pairro.clipboard.ClipboardHistory;
 import pairro.clipboard.ClipboardMonitor;
 import pairro.network.Commands;
+import pairro.network.security.Codec;
 import pairro.network.server.ClientHandler;
 
 public class ClipboardHandler {
@@ -78,7 +79,7 @@ public class ClipboardHandler {
       return;
     }
 
-    client.send(Commands.Clipboard.STATE + encode(text));
+    client.send(Commands.Clipboard.STATE + Codec.toBase64(text));
   }
 
   private void sendHistory(ClientHandler client) {
@@ -87,7 +88,7 @@ public class ClipboardHandler {
     }
 
     for (ClipboardHistory.Entry entry : this.clipboardHistory.snapshot()) {
-      client.send(Commands.Clipboard.ENTRY + entry.getId() + "," + entry.getTimestamp() + "," + encode(entry.getText()));
+      client.send(Commands.Clipboard.ENTRY + entry.getId() + "," + entry.getTimestamp() + "," + Codec.toBase64(entry.getText()));
     }
 
     client.send(Commands.Clipboard.HISTORY_END);
@@ -109,13 +110,9 @@ public class ClipboardHandler {
     }
   }
 
-  private String encode(String text) {
-    return Base64.getEncoder().encodeToString(text.getBytes(StandardCharsets.UTF_8));
-  }
-
   private String decode(String payload) {
     try {
-      return new String(Base64.getDecoder().decode(payload), StandardCharsets.UTF_8);
+      return Codec.textFromBase64(payload);
     } catch (IllegalArgumentException exception) {
       System.err.println("[Clipboard] Malformed payload: " + payload);
 

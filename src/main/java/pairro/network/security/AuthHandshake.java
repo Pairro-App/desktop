@@ -4,7 +4,6 @@ import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
 import java.security.SecureRandom;
-import java.util.Base64;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -24,7 +23,7 @@ public final class AuthHandshake {
     byte[] nonce = new byte[NONCE_BYTES];
     RANDOM.nextBytes(nonce);
 
-    return Base64.getEncoder().encodeToString(nonce);
+    return Codec.toBase64(nonce);
   }
 
   public static boolean isValidNonce(String nonce) {
@@ -33,7 +32,7 @@ public final class AuthHandshake {
     }
 
     try {
-      return Base64.getDecoder().decode(nonce).length == NONCE_BYTES;
+      return Codec.fromBase64(nonce).length == NONCE_BYTES;
     } catch (IllegalArgumentException e) {
       return false;
     }
@@ -52,7 +51,7 @@ public final class AuthHandshake {
           auth.serverNonce(),
           auth.certificateFingerprint());
 
-      return Base64.getEncoder().encodeToString(mac.doFinal(transcript.getBytes(StandardCharsets.UTF_8)));
+      return Codec.toBase64(mac.doFinal(transcript.getBytes(StandardCharsets.UTF_8)));
     } catch (GeneralSecurityException e) {
       throw new IllegalStateException("Could not compute authentication proof", e);
     }
