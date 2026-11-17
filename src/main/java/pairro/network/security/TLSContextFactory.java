@@ -36,9 +36,6 @@ public class TLSContextFactory {
 
   private static volatile SSLContext cachedContext;
 
-  private TLSContextFactory() {
-  }
-
   public static void warmUp() {
     try {
       createServerContext();
@@ -98,7 +95,10 @@ public class TLSContextFactory {
     return created.toCharArray();
   }
 
-  private static KeyStore loadOrCreateKeyStore(Path keystorePath, char[] password) throws Exception {
+  private static KeyStore loadOrCreateKeyStore(
+    Path keystorePath,
+    char[] password
+  ) throws Exception {
     KeyStore keyStore = KeyStore.getInstance("PKCS12");
 
     if (Files.exists(keystorePath)) {
@@ -136,18 +136,18 @@ public class TLSContextFactory {
     BigInteger serial = new BigInteger(64, new SecureRandom());
 
     JcaX509v3CertificateBuilder builder = new JcaX509v3CertificateBuilder(
-        name,
-        serial,
-        Date.from(now.minus(1, ChronoUnit.DAYS)),
-        Date.from(now.plus(3650, ChronoUnit.DAYS)),
-        name,
-        keyPair.getPublic());
+      name,
+      serial,
+      Date.from(now.minus(1, ChronoUnit.DAYS)),
+      Date.from(now.plus(3650, ChronoUnit.DAYS)),
+      name,
+      keyPair.getPublic()
+    );
 
     ContentSigner signer = new JcaContentSignerBuilder("SHA256WithRSA").build(keyPair.getPrivate());
 
     return new JcaX509CertificateConverter()
-        .setProvider(BouncyCastleProvider.PROVIDER_NAME)
-        .getCertificate(builder.build(signer));
+      .setProvider(BouncyCastleProvider.PROVIDER_NAME)
+      .getCertificate(builder.build(signer));
   }
-
 }

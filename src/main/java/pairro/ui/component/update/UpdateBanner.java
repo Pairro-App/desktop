@@ -19,7 +19,10 @@ public class UpdateBanner extends HBox {
     hide();
   }
 
-  public void show(String message, Runnable onDownload) {
+  public void show(
+    String message,
+    Runnable onDownload
+  ) {
     Label titleLabel = new Label(message);
     titleLabel.getStyleClass().add("pairing-banner-title");
 
@@ -35,9 +38,8 @@ public class UpdateBanner extends HBox {
         "pairing-banner-accept",
         "update-banner-download");
     downloadBtn.setOnAction(e -> {
-      if (onDownload != null) {
-        onDownload.run();
-      }
+      onDownload.run();
+
       hide();
     });
 

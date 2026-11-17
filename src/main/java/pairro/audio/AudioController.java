@@ -7,16 +7,23 @@ public class AudioController {
   private static final int MAX_VOLUME_PERCENT = 100;
   private static final int UNAVAILABLE = -1;
 
+  private boolean backendLoadAttempted = false;
   private boolean isBackendReady = false;
 
-  public AudioController() {
-    try {
-      NativeWindowsAudio.load();
+  private synchronized boolean backendReady() {
+    if (!backendLoadAttempted) {
+      backendLoadAttempted = true;
 
-      this.isBackendReady = true;
-    } catch (IOException exception) {
-      System.err.println("[AudioController] Failed to start audio backend: " + exception.getMessage());
+      try {
+        NativeWindowsAudio.load();
+
+        this.isBackendReady = true;
+      } catch (IOException exception) {
+        System.err.println("[AudioController] Failed to start audio backend: " + exception.getMessage());
+      }
     }
+
+    return this.isBackendReady;
   }
 
   public void volumeUp(float step) {
@@ -48,7 +55,7 @@ public class AudioController {
   }
 
   private void setMuteState(boolean isMuted) {
-    if (!this.isBackendReady) {
+    if (!backendReady()) {
       return;
     }
 
@@ -64,7 +71,7 @@ public class AudioController {
   }
 
   public void setVolumePercent(int percent) {
-    if (!this.isBackendReady) {
+    if (!backendReady()) {
       return;
     }
 
@@ -78,7 +85,7 @@ public class AudioController {
   }
 
   public int getVolumePercent() {
-    if (!this.isBackendReady) {
+    if (!backendReady()) {
       return UNAVAILABLE;
     }
 
@@ -94,7 +101,7 @@ public class AudioController {
   }
 
   public boolean isMuted() {
-    if (!this.isBackendReady) {
+    if (!backendReady()) {
       return false;
     }
 

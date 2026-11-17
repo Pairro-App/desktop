@@ -53,7 +53,10 @@ public class ToggleSwitch extends StackPane {
     return selected;
   }
 
-  private void apply(boolean on, boolean animate) {
+  private void apply(
+    boolean on,
+    boolean animate
+  ) {
     if (on) {
       if (!getStyleClass().contains("on")) {
         getStyleClass().add("on");

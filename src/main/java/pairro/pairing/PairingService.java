@@ -29,7 +29,10 @@ public class PairingService {
     }
   }
 
-  public Challenge createChallenge(String addressKey, String clientPublicKeyStr) {
+  public Challenge createChallenge(
+    String addressKey,
+    String clientPublicKeyStr
+  ) {
     KeyPair desktopKeyPair = CryptoUtils.generateKeyPair();
     pendingChallenges.put(addressKey, desktopKeyPair);
 
@@ -44,7 +47,10 @@ public class PairingService {
     pendingChallenges.remove(addressKey);
   }
 
-  public String completePairing(String deviceId, String deviceName) {
+  public String completePairing(
+    String deviceId,
+    String deviceName
+  ) {
     String token = UUID.randomUUID().toString();
 
     pairedDevices.save(deviceId, deviceName, token);

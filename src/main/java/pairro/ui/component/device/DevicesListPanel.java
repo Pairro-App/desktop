@@ -1,8 +1,11 @@
 package pairro.ui.component.device;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
 
@@ -26,20 +29,25 @@ public class DevicesListPanel extends VBox {
   private final Runnable onDisconnect;
   private final DeviceHeaderCard headerCard;
 
+  private final Map<String, DeviceRow> rowCache = new HashMap<>();
+  private final Map<String, String> rowSignatures = new HashMap<>();
+  private String searchQuery = "";
+
   private List<Device> lastDevices = List.of();
   private Device connectedDevice;
   private Instant connectedSince;
 
   public DevicesListPanel(
-      String deviceName,
-      boolean connected,
-      List<Device> devices,
-      Consumer<Device> onSelectDevice,
-      Consumer<Device> onUnpairDevice,
-      Runnable onToggleConnection,
-      Runnable onRefresh,
-      Runnable onDisconnect,
-      Runnable onOpenSettings) {
+    String deviceName,
+    boolean connected,
+    List<Device> devices,
+    Consumer<Device> onSelectDevice,
+    Consumer<Device> onUnpairDevice,
+    Runnable onToggleConnection,
+    Runnable onRefresh,
+    Runnable onDisconnect,
+    Runnable onOpenSettings
+  ) {
     super(0);
     this.onSelectDevice = onSelectDevice;
     this.onUnpairDevice = onUnpairDevice;
@@ -78,20 +86,22 @@ public class DevicesListPanel extends VBox {
 
   public void setDevices(List<Device> devices) {
     lastDevices = devices == null ? List.of() : devices;
-    rowsBox.getChildren().clear();
 
     List<Device> paired = lastDevices.stream()
-        .filter(Device::isPaired)
-        .sorted(Comparator.comparing(d -> !isConnected(d)))
-        .toList();
+      .filter(Device::isPaired)
+      .sorted(Comparator.comparing(d -> !isConnected(d)))
+      .toList();
     List<Device> unpaired = lastDevices.stream().filter(d -> !d.isPaired()).toList();
 
     if (paired.isEmpty() && unpaired.isEmpty()) {
+      rowCache.clear();
+      rowSignatures.clear();
+
       rowsBox.setAlignment(Pos.CENTER);
 
       VBox.setVgrow(rowsBox, Priority.ALWAYS);
 
-      rowsBox.getChildren().add(emptyState);
+      rowsBox.getChildren().setAll(emptyState);
 
       return;
     }
@@ -99,8 +109,12 @@ public class DevicesListPanel extends VBox {
     rowsBox.setAlignment(Pos.TOP_LEFT);
     rowsBox.setPadding(new Insets(0, 0, 16, 0));
 
+    List<Node> nodes = new ArrayList<>();
+    Map<String, DeviceRow> nextCache = new HashMap<>();
+    Map<String, String> nextSignatures = new HashMap<>();
+
     for (Device device : paired) {
-      rowsBox.getChildren().add(createRow(device));
+      nodes.add(rowFor(device, nextCache, nextSignatures));
     }
 
     if (!paired.isEmpty() && !unpaired.isEmpty()) {
@@ -108,12 +122,44 @@ public class DevicesListPanel extends VBox {
       gap.setMinHeight(8);
       gap.setPrefHeight(8);
       gap.setMaxHeight(8);
-      rowsBox.getChildren().add(gap);
+      nodes.add(gap);
     }
 
     for (Device device : unpaired) {
-      rowsBox.getChildren().add(createRow(device));
+      nodes.add(rowFor(device, nextCache, nextSignatures));
     }
+
+    rowCache.clear();
+    rowCache.putAll(nextCache);
+    rowSignatures.clear();
+    rowSignatures.putAll(nextSignatures);
+
+    rowsBox.getChildren().setAll(nodes);
+    filter(searchQuery);
+  }
+
+  private DeviceRow rowFor(
+    Device device,
+    Map<String, DeviceRow> nextCache,
+    Map<String, String> nextSignatures
+  ) {
+    String key = device.getId();
+    String signature = signatureOf(device);
+    DeviceRow row = rowCache.get(key);
+
+    if (row == null || !signature.equals(rowSignatures.get(key))) {
+      row = createRow(device);
+    }
+
+    nextCache.put(key, row);
+    nextSignatures.put(key, signature);
+
+    return row;
+  }
+
+  private String signatureOf(Device device) {
+    return device.getName() + '|' + device.isPaired() + '|' + device.getStatus() + '|'
+      + (isConnected(device) ? connectedSince : "-");
   }
 
   public void setDeviceName(String deviceName) {
@@ -163,6 +209,7 @@ public class DevicesListPanel extends VBox {
 
   private void filter(String query) {
     String q = query == null ? "" : query.trim().toLowerCase();
+    searchQuery = q;
 
     for (Node node : rowsBox.getChildren()) {
       if (node instanceof DeviceRow row) {

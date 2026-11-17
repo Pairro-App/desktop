@@ -1,14 +1,9 @@
 package pairro.network.handler;
 
 import pairro.input.MouseController;
+import pairro.network.Commands;
 
 public class MouseInputHandler {
-  private static final String MOUSE_MOVE_PREFIX = "MOUSE_MOVE:";
-  private static final String MOUSE_LEFT_CLICK = "MOUSE_LEFT_CLICK";
-  private static final String MOUSE_RIGHT_CLICK = "MOUSE_RIGHT_CLICK";
-  private static final String MOUSE_LEFT_DOWN = "MOUSE_LEFT_DOWN";
-  private static final String MOUSE_LEFT_UP = "MOUSE_LEFT_UP";
-
   private final MouseController mouseController;
 
   public MouseInputHandler(MouseController mouseController) {
@@ -24,30 +19,30 @@ public class MouseInputHandler {
       return false;
     }
 
-    if (data.startsWith(MOUSE_MOVE_PREFIX)) {
+    if (data.startsWith(Commands.Mouse.MOVE)) {
       handleMouseMove(data);
       return true;
     }
 
-    if (MOUSE_LEFT_CLICK.equals(data)) {
+    if (Commands.Mouse.LEFT_CLICK.equals(data)) {
       mouseController.leftClick();
 
       return true;
     }
 
-    if (MOUSE_RIGHT_CLICK.equals(data)) {
+    if (Commands.Mouse.RIGHT_CLICK.equals(data)) {
       mouseController.rightClick();
 
       return true;
     }
 
-    if (MOUSE_LEFT_DOWN.equals(data)) {
+    if (Commands.Mouse.LEFT_DOWN.equals(data)) {
       mouseController.leftButtonDown();
 
       return true;
     }
 
-    if (MOUSE_LEFT_UP.equals(data)) {
+    if (Commands.Mouse.LEFT_UP.equals(data)) {
       mouseController.leftButtonUp();
 
       return true;
@@ -58,7 +53,7 @@ public class MouseInputHandler {
 
   private void handleMouseMove(String data) {
     try {
-      String payload = data.substring(MOUSE_MOVE_PREFIX.length());
+      String payload = data.substring(Commands.Mouse.MOVE.length());
       String[] parts = payload.split(",", 2);
 
       int x = Integer.parseInt(parts[0].trim());

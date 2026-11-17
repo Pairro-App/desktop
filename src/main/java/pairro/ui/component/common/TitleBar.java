@@ -15,7 +15,11 @@ public class TitleBar extends HBox {
   private double dragOffsetX;
   private double dragOffsetY;
 
-  public TitleBar(Stage stage, String title, Runnable onClose) {
+  public TitleBar(
+    Stage stage,
+    String title,
+    Runnable onClose
+  ) {
     getStyleClass().add("title-bar");
     setAlignment(Pos.CENTER_LEFT);
     setPadding(new Insets(0, 6, 0, 10));

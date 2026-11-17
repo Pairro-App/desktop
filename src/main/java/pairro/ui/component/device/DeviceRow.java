@@ -37,11 +37,12 @@ public class DeviceRow extends HBox {
   private boolean confirming = false;
 
   public DeviceRow(
-      Device device,
-      Instant connectedSince,
-      Consumer<Device> onSelect,
-      Consumer<Device> onUnpair,
-      Runnable onDisconnect) {
+    Device device,
+    Instant connectedSince,
+    Consumer<Device> onSelect,
+    Consumer<Device> onUnpair,
+    Runnable onDisconnect
+  ) {
     this.device = device;
     boolean connected = connectedSince != null;
 
@@ -122,9 +123,7 @@ public class DeviceRow extends HBox {
       disconnectBtn.setOnAction(e -> {
         e.consume();
 
-        if (onDisconnect != null) {
-          onDisconnect.run();
-        }
+        onDisconnect.run();
       });
 
       disconnectBtn.addEventFilter(MouseEvent.MOUSE_CLICKED, Event::consume);
@@ -217,8 +216,8 @@ public class DeviceRow extends HBox {
     long seconds = total % 60;
 
     timeLabel.setText(hours > 0
-        ? String.format("%d:%02d:%02d", hours, minutes, seconds)
-        : String.format("%02d:%02d", minutes, seconds));
+      ? String.format("%d:%02d:%02d", hours, minutes, seconds)
+      : String.format("%02d:%02d", minutes, seconds));
   }
 
   public Device getDevice() {

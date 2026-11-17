@@ -2,12 +2,6 @@
 
 @font-face {
   font-family: "Plus Jakarta Sans";
-  font-weight: 600;
-  src: url("fonts/PlusJakartaSans-SemiBold.ttf");
-}
-
-@font-face {
-  font-family: "Plus Jakarta Sans";
   font-weight: bold;
   src: url("fonts/PlusJakartaSans-Bold.ttf");
 }
@@ -15,12 +9,6 @@
 @font-face {
   font-family: "Inter";
   src: url("fonts/Inter-Regular.ttf");
-}
-
-@font-face {
-  font-family: "Inter";
-  font-weight: 500;
-  src: url("fonts/Inter-Medium.ttf");
 }
 
 @font-face {
@@ -34,7 +22,6 @@
 }
 
 /* Root & Global Layout */
-
 .root {
   -wine-deep: #4e1238;
   -wine: #7a1e52;
@@ -94,7 +81,6 @@
 }
 
 /* Tooltip */
-
 .tooltip {
   -fx-background-color: -wine-deep;
   -fx-text-fill: #ffffff;
@@ -105,18 +91,6 @@
 }
 
 /* Title Bar */
-
-.section-separator {
-  -fx-border-color: -border-subtle transparent transparent transparent;
-  -fx-border-width: 1px 0 0 0;
-  -fx-background-color: transparent;
-}
-
-.section-separator .line {
-  -fx-border-color: transparent;
-  -fx-background-color: transparent;
-}
-
 .title-bar {
   -fx-background-color: -wine-deep;
   -fx-min-height: 38px;
@@ -161,7 +135,6 @@
 }
 
 /* Devices Panel  */
-
 .dashboard-main {
   -fx-background-color: -hero-gradient;
 }
@@ -275,26 +248,6 @@
   -fx-text-fill: -text-primary;
 }
 
-.devices-section-container {
-  -fx-alignment: center-left;
-  -fx-padding: 12px 0 6px 4px;
-}
-
-.devices-section-label {
-  -fx-font-family: "Plus Jakarta Sans";
-  -fx-font-size: 12px;
-  -fx-font-weight: bold;
-  -fx-text-fill: -magenta;
-}
-
-.devices-section-line {
-  -fx-background-color: -magenta;
-  -fx-background-radius: 999px;
-  -fx-min-height: 5px;
-  -fx-pref-height: 5px;
-  -fx-max-height: 5px;
-}
-
 .search-bar {
   -fx-background-color: #ffffff;
   -fx-background-radius: 18px;
@@ -352,7 +305,6 @@
 }
 
 /* Device rows */
-
 .device-row {
   -fx-cursor: hand;
   -fx-background-radius: 16px;
@@ -420,7 +372,6 @@
 }
 
 /* Connected device row */
-
 .device-row.connected {
   -fx-background-color: rgba(46, 196, 182, 0.10);
   -fx-border-color: rgba(46, 196, 182, 0.55);
@@ -473,7 +424,6 @@
 }
 
 /* Information Panel */
-
 .sheet-scrim {
   -fx-background-color: rgba(58, 21, 48, 0.40);
 }
@@ -485,7 +435,7 @@
   -fx-border-radius: 28px 28px 0 0;
   -fx-border-width: 1px 1px 0 1px;
   -fx-padding: 22px 20px 24px 20px;
-  -fx-effect: dropshadow(gaussian, rgba(58, 21, 48, 0.30), 24, 0, 0, -4);
+  -fx-effect: dropshadow(three-pass-box, rgba(58, 21, 48, 0.30), 24, 0, 0, -4);
 }
 
 .info-title {
@@ -576,7 +526,6 @@
 }
 
 /* Shared Components & Controls */
-
 .status-badge {
   -fx-font-family: "Inter";
   -fx-font-size: 12px;
@@ -650,10 +599,6 @@
   -fx-fill: -magenta;
 }
 
-.close-button {
-  -fx-background-color: transparent;
-}
-
 .copy-button {
   -fx-background-color: transparent;
   -fx-background-radius: 8px;
@@ -707,7 +652,6 @@
 }
 
 /* Icons & SVG Vectors */
-
 .icon {
   -fx-fill: -text-secondary;
 }
@@ -724,12 +668,6 @@
   -fx-scale-y: 0.95;
 }
 
-.phone-icon-big {
-  -fx-fill: -magenta;
-  -fx-scale-x: 2.25;
-  -fx-scale-y: 2.25;
-}
-
 /* Banners & Notifications */
 .update-banner-download {
   -fx-font-family: "Plus Jakarta Sans";
@@ -744,7 +682,7 @@
   -fx-border-color: -border-subtle;
   -fx-border-radius: 16px;
   -fx-padding: 10px 14px;
-  -fx-effect: dropshadow(gaussian, rgba(78, 18, 56, 0.18), 12, 0, 0, 3);
+  -fx-effect: dropshadow(three-pass-box, rgba(78, 18, 56, 0.18), 12, 0, 0, 3);
 }
 
 .pairing-banner-title {
@@ -796,7 +734,6 @@
 }
 
 /* Unpaired devices */
-
 .device-row.unpaired {
   -fx-background-color: rgba(255, 255, 255, 0.60);
   -fx-border-color: -border-strong;
@@ -818,7 +755,6 @@
 }
 
 /* Inline unpair confirmation */
-
 .device-row.confirming,
 .device-row.confirming:hover {
   -fx-background-color: rgba(225, 29, 72, 0.06);
@@ -897,7 +833,6 @@
 }
 
 /* Settings page */
-
 .settings-view {
   -fx-background-color: -hero-gradient;
 }
@@ -1021,7 +956,6 @@
 }
 
 /* Custom scrollbar */
-
 .groups-scroll .scroll-bar:vertical {
   -fx-background-color: transparent;
   -fx-background-insets: 0;

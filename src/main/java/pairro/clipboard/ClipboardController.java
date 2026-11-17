@@ -9,10 +9,16 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 
 public class ClipboardController {
-  private final Clipboard clipboard;
+  private Clipboard clipboard;
+  private boolean initialized;
 
-  public ClipboardController() {
-    this.clipboard = initializeClipboard();
+  private synchronized Clipboard clipboard() {
+    if (!initialized) {
+      initialized = true;
+      clipboard = initializeClipboard();
+    }
+
+    return clipboard;
   }
 
   private Clipboard initializeClipboard() {
@@ -34,16 +40,16 @@ public class ClipboardController {
   }
 
   private String readText(boolean logErrors) {
-    if (this.clipboard == null) {
+    if (clipboard() == null) {
       return null;
     }
 
     try {
-      if (!this.clipboard.isDataFlavorAvailable(DataFlavor.stringFlavor)) {
+      if (!clipboard().isDataFlavorAvailable(DataFlavor.stringFlavor)) {
         return null;
       }
 
-      Object content = this.clipboard.getData(DataFlavor.stringFlavor);
+      Object content = clipboard().getData(DataFlavor.stringFlavor);
 
       return content instanceof String ? (String) content : null;
     } catch (UnsupportedFlavorException | IOException | IllegalStateException exception) {
@@ -56,12 +62,12 @@ public class ClipboardController {
   }
 
   public void setText(String text) {
-    if (this.clipboard == null) {
+    if (clipboard() == null) {
       return;
     }
 
     try {
-      this.clipboard.setContents(new StringSelection(text), null);
+      clipboard().setContents(new StringSelection(text), null);
     } catch (IllegalStateException exception) {
       System.err.println("[ClipboardController] Failed to write clipboard: " + exception.getMessage());
     }
@@ -70,8 +76,8 @@ public class ClipboardController {
   public void appendText(String text) {
     String existingText = getText();
     String combinedText = (existingText == null || existingText.isEmpty())
-        ? text
-        : existingText + "\n" + text;
+      ? text
+      : existingText + "\n" + text;
 
     setText(combinedText);
   }

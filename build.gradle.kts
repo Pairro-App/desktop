@@ -5,7 +5,7 @@ plugins {
   id("org.beryx.runtime") version "1.13.1"
 }
 
-version = "0.9.1"
+version = "0.9.2"
 
 repositories {
   mavenCentral()
@@ -15,6 +15,7 @@ dependencies {
   testImplementation("org.junit.jupiter:junit-jupiter:5.10.2")
   implementation("org.jmdns:jmdns:3.6.3")
   implementation("org.bouncycastle:bcpkix-jdk18on:1.78.1")
+  implementation("com.fasterxml.jackson.core:jackson-databind:2.18.5")
 }
 
 javafx {
@@ -54,22 +55,36 @@ runtime {
     "java.logging",
     "java.scripting",
     "java.xml",
+    "java.sql",
     "jdk.unsupported",
     "jdk.crypto.ec"
   ))
   jpackage {
-    imageName = "Pairro"
-    installerName = "Pairro"
-    installerType = "exe"
-    imageOptions = listOf("--icon", "src/main/resources/icon.ico")
-    installerOptions = listOf(
-      "--icon", "src/main/resources/icon.ico",
-      "--vendor", "Pairro",
-      "--app-version", project.version.toString(),
-      "--win-menu",
-      "--win-shortcut",
-      "--win-dir-chooser",
-      "--win-per-user-install"
-    )
+      imageName = "Pairro"
+      installerName = "Pairro"
+      installerType = "exe"
+
+      jvmArgs = listOf(
+        "-XX:+UseSerialGC",
+        "-Xms16m",
+        "-Xmx140m",
+        "-XX:MinHeapFreeRatio=10",
+        "-XX:MaxHeapFreeRatio=30",
+        "-XX:TieredStopAtLevel=1",
+        "-XX:ReservedCodeCacheSize=32m",
+        "-XX:-UsePerfData",
+        "-Dprism.order=d3d,sw"
+      )
+
+      imageOptions = listOf("--icon", "src/main/resources/icon.ico")
+      installerOptions = listOf(
+        "--icon", "src/main/resources/icon.ico",
+        "--vendor", "Pairro",
+        "--app-version", project.version.toString(),
+        "--win-menu",
+        "--win-shortcut",
+        "--win-dir-chooser",
+        "--win-per-user-install"
+      )
   }
 }

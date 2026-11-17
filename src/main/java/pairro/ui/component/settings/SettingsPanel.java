@@ -16,17 +16,17 @@ import pairro.ui.icon.IconPaths;
 
 public class SettingsPanel extends VBox {
 
-  public SettingsPanel(Runnable onBack, SettingsStore settingsStore, Consumer<String> onDeviceNameChanged) {
+  public SettingsPanel(
+    Runnable onBack,
+    SettingsStore settingsStore,
+    Consumer<String> onDeviceNameChanged
+  ) {
     super(0);
     getStyleClass().add("settings-view");
 
     Button backBtn = ComponentFactory.createIconButton(IconPaths.ARROW_BACK, "settings-back-brn");
     ComponentFactory.setTooltip(backBtn, "Back");
-    backBtn.setOnAction(e -> {
-      if (onBack != null) {
-        onBack.run();
-      }
-    });
+    backBtn.setOnAction(e -> onBack.run());
 
     Label title = new Label("Settings");
     title.getStyleClass().add("settings-title");
@@ -36,68 +36,75 @@ public class SettingsPanel extends VBox {
     topBar.getStyleClass().add("settings-top-bar");
 
     HBox closeToTrayRow = SettingsRows.switchRow(
-        "Close minimizes to tray",
-        "Closing the window keeps Pairro running in the tray",
-        settingsStore.isCloseToTray());
+      "Close minimizes to tray",
+      "Closing the window keeps Pairro running in the tray",
+      settingsStore.isCloseToTray());
 
     VBox cards = new VBox(12,
-        new SettingsCard("Startup",
+      new SettingsCard("Startup",
+        SettingsRows.switchRow(
+          "Check for updates",
+          "Check for updates on Pairro launch",
+          settingsStore.isCheckUpdate(),
+          settingsStore::setCheckUpdate
+        ),
 
-            SettingsRows.switchRow(
-              "Check for updates",
-              "Check for updates on Pairro launch",
-              settingsStore.isCheckUpdate(),
-              settingsStore::setCheckUpdate),
+        SettingsRows.switchRow(
+          "Open on Windows startup",
+          "Launch Pairro when you sign in to Windows",
+          settingsStore.isOpenOnStartup(),
+          settingsStore::setOpenOnStartup
+        ),
 
-            SettingsRows.switchRow(
-                "Open on Windows startup",
-                "Launch Pairro when you sign in to Windows",
-                settingsStore.isOpenOnStartup(),
-                settingsStore::setOpenOnStartup),
+        SettingsRows.switchRow(
+          "Open in tray",
+          "Start minimized in the system tray instead of showing the window",
+          settingsStore.isOpenInTray(),
+          settingsStore::setOpenInTray),
+          closeToTrayRow
+      ),
 
-            SettingsRows.switchRow(
-                "Open in tray",
-                "Start minimized in the system tray instead of showing the window",
-                settingsStore.isOpenInTray(),
-                settingsStore::setOpenInTray),
-            closeToTrayRow),
+      new SettingsCard("Device",
+        SettingsRows.textFieldRow(
+          "Device name",
+          "How this PC appears to other devices",
+          settingsStore.getDeviceName(),
+          DeviceName.DEFAULT,
+          raw -> {
+            String name = DeviceName.normalize(raw);
+            if (!name.equals(settingsStore.getDeviceName())) {
+              settingsStore.setDeviceName(name);
+              onDeviceNameChanged.accept(name);
+            }
 
-        new SettingsCard("Device",
-            SettingsRows.textFieldRow(
-                "Device name",
-                "How this PC appears to other devices",
-                settingsStore.getDeviceName(),
-                DeviceName.DEFAULT,
-                raw -> {
-                  String name = DeviceName.normalize(raw);
+            return name;
+          }
+        ),
 
-                  if (!name.equals(settingsStore.getDeviceName())) {
-                    settingsStore.setDeviceName(name);
-                    onDeviceNameChanged.accept(name);
-                  }
+        SettingsRows.switchRow(
+          "Auto-start discoverability",
+          "Become visible to phones as soon as the app opens",
+          settingsStore.isAutoStartDiscoverability(),
+          settingsStore::setAutoStartDiscoverability
+        )
+      ),
 
-                  return name;
-                }),
+      new SettingsCard("Behavior",
+        SettingsRows.switchRow(
+          "Show notifications",
+          "Notify when a device connects or disconnects",
+          settingsStore.isShowNotifications(),
+          settingsStore::setShowNotifications)
+      ),
 
-            SettingsRows.switchRow(
-                "Auto-start discoverability",
-                "Become visible to phones as soon as the app opens",
-                settingsStore.isAutoStartDiscoverability(),
-                settingsStore::setAutoStartDiscoverability)),
-
-        new SettingsCard("Behavior",
-            SettingsRows.switchRow(
-                "Show notifications",
-                "Notify when a device connects or disconnects",
-                settingsStore.isShowNotifications(),
-                settingsStore::setShowNotifications)),
-
-        new SettingsCard("Safety",
-            SettingsRows.switchRow(
-                "Confirm before unpairing",
-                "Ask first when removing a paired device",
-                settingsStore.isConfirmBeforeUnpairing(),
-                settingsStore::setConfirmBeforeUnpairing)));
+      new SettingsCard("Safety",
+        SettingsRows.switchRow(
+          "Confirm before unpairing",
+          "Ask first when removing a paired device",
+          settingsStore.isConfirmBeforeUnpairing(),
+          settingsStore::setConfirmBeforeUnpairing)
+      )
+    );
 
     Label version = new Label("Pairro 1.0");
     version.getStyleClass().add("settings-version");

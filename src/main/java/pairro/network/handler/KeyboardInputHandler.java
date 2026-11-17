@@ -1,10 +1,9 @@
 package pairro.network.handler;
 
 import pairro.input.KeyboardController;
+import pairro.network.Commands;
 
 public class KeyboardInputHandler {
-  private static final String KEY_COMBO_PREFIX = "KEY_COMBO:";
-
   private final KeyboardController keyboardController;
 
   public KeyboardInputHandler(KeyboardController keyboardController) {
@@ -20,7 +19,7 @@ public class KeyboardInputHandler {
       return false;
     }
 
-    if (data.startsWith(KEY_COMBO_PREFIX)) {
+    if (data.startsWith(Commands.Keyboard.KEY_COMBO)) {
       handleKeyCombo(data);
 
       return true;
@@ -31,7 +30,7 @@ public class KeyboardInputHandler {
 
   private void handleKeyCombo(String data) {
     try {
-      String payload = data.substring(KEY_COMBO_PREFIX.length());
+      String payload = data.substring(Commands.Keyboard.KEY_COMBO.length());
       String[] parts = payload.split(",");
 
       int[] keyCodes = new int[parts.length];

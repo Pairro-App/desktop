@@ -25,10 +25,23 @@ public class TrayManager {
   private final Stage stage;
   private final SettingsStore settingsStore;
   private TrayIcon trayIcon;
+  private Runnable onHidden = () -> {};
+  private Runnable onShown = () -> {};
 
-  public TrayManager(Stage stage, SettingsStore settingsStore) {
+  public TrayManager(
+    Stage stage,
+    SettingsStore settingsStore
+  ) {
     this.stage = stage;
     this.settingsStore = settingsStore;
+  }
+
+  public void setOnHidden(Runnable onHidden) {
+    this.onHidden = onHidden;
+  }
+
+  public void setOnShown(Runnable onShown) {
+    this.onShown = onShown;
   }
 
   public static boolean isSupported() {
@@ -39,6 +52,7 @@ public class TrayManager {
     if (settingsStore.isCloseToTray() && isSupported() && addTrayIcon()) {
       Platform.setImplicitExit(false);
       stage.hide();
+      onHidden.run();
 
       return;
     }
@@ -54,6 +68,8 @@ public class TrayManager {
 
   private void showWindow() {
     removeTrayIcon();
+
+    onShown.run();
 
     stage.show();
     stage.setIconified(false);

@@ -21,7 +21,10 @@ public class ToastPane extends StackPane {
 
   private final Rectangle progressBar;
 
-  public ToastPane(ToastContent content, Image icon) {
+  public ToastPane(
+    ToastContent content,
+    Image icon
+  ) {
     getStylesheets().add(getClass().getResource("/styles/toast.css").toExternalForm());
     getStyleClass().add("toast-pane");
 
@@ -40,6 +43,7 @@ public class ToastPane extends StackPane {
 
     StackPane iconTile = new StackPane();
     iconTile.getStyleClass().add("toast-icon-tile");
+
     if (icon != null) {
       ImageView imageView = new ImageView(icon);
       imageView.setFitWidth(30);

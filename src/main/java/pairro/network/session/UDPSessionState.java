@@ -10,7 +10,7 @@ public class UDPSessionState {
   private volatile UDPCrypto crypto;
 
   public void setSessionKey(byte[] keyBytes) {
-    this.crypto = keyBytes != null ? new UDPCrypto(keyBytes) : null;
+    this.crypto = new UDPCrypto(keyBytes);
   }
 
   public void setTrustedAddress(InetAddress address) {
@@ -26,7 +26,11 @@ public class UDPSessionState {
     return trustedAddress != null && trustedAddress.equals(address);
   }
 
-  public String decrypt(byte[] data, int length, InetAddress sourceAddress) {
+  public String decrypt(
+    byte[] data,
+    int length,
+    InetAddress sourceAddress
+  ) {
     if (!isTrustedSource(sourceAddress)) {
       System.out.println("[Network] Dropping UDP packet from untrusted source: " + sourceAddress);
 

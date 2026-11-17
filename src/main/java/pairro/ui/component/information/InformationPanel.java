@@ -30,11 +30,7 @@ public class InformationPanel extends VBox {
 
     Button closeBtn = ComponentFactory.createIconButton(IconPaths.CLOSE, "header-action-btn");
     ComponentFactory.setTooltip(closeBtn, "Close");
-    closeBtn.setOnAction(e -> {
-      if (onClose != null) {
-        onClose.run();
-      }
-    });
+    closeBtn.setOnAction(e -> onClose.run());
 
     HBox titleRow = new HBox(8, title, spacer, closeBtn);
     titleRow.setAlignment(Pos.CENTER_LEFT);

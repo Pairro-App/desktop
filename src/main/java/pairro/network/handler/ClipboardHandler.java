@@ -6,19 +6,11 @@ import java.util.Base64;
 import pairro.clipboard.ClipboardController;
 import pairro.clipboard.ClipboardHistory;
 import pairro.clipboard.ClipboardMonitor;
+import pairro.network.Commands;
+import pairro.network.security.Codec;
 import pairro.network.server.ClientHandler;
 
 public class ClipboardHandler {
-  private static final String CLIPBOARD_GET = "CLIPBOARD_GET";
-  private static final String CLIPBOARD_SET_PREFIX = "CLIPBOARD_SET:";
-  private static final String CLIPBOARD_APPEND_PREFIX = "CLIPBOARD_APPEND:";
-  private static final String CLIPBOARD_STATE_PREFIX = "CLIPBOARD_STATE:";
-
-  private static final String CLIPBOARD_HISTORY_GET = "CLIPBOARD_HISTORY_GET";
-  private static final String CLIPBOARD_HISTORY_CLEAR = "CLIPBOARD_HISTORY_CLEAR";
-  private static final String CLIPBOARD_ENTRY_PREFIX = "CLIPBOARD_ENTRY:";
-  private static final String CLIPBOARD_HISTORY_END = "CLIPBOARD_HISTORY_END";
-
   private final ClipboardController clipboardController;
   private final ClipboardHistory clipboardHistory;
   private final ClipboardMonitor clipboardMonitor;
@@ -37,37 +29,40 @@ public class ClipboardHandler {
     this.clipboardMonitor.stop();
   }
 
-  public boolean handleCommand(String data, ClientHandler client) {
+  public boolean handleCommand(
+    String data,
+    ClientHandler client
+  ) {
     if (data == null || data.isEmpty()) {
       return false;
     }
 
-    if (CLIPBOARD_GET.equals(data)) {
+    if (Commands.Clipboard.GET.equals(data)) {
       sendState(client);
 
       return true;
     }
 
-    if (CLIPBOARD_HISTORY_GET.equals(data)) {
+    if (Commands.Clipboard.HISTORY_GET.equals(data)) {
       this.clipboardMonitor.start();
       sendHistory(client);
 
       return true;
     }
 
-    if (CLIPBOARD_HISTORY_CLEAR.equals(data)) {
+    if (Commands.Clipboard.HISTORY_CLEAR.equals(data)) {
       this.clipboardHistory.clear();
 
       return true;
     }
 
-    if (data.startsWith(CLIPBOARD_SET_PREFIX)) {
+    if (data.startsWith(Commands.Clipboard.SET)) {
       handleSet(data);
 
       return true;
     }
 
-    if (data.startsWith(CLIPBOARD_APPEND_PREFIX)) {
+    if (data.startsWith(Commands.Clipboard.APPEND)) {
       handleAppend(data);
 
       return true;
@@ -87,7 +82,7 @@ public class ClipboardHandler {
       return;
     }
 
-    client.send(CLIPBOARD_STATE_PREFIX + encode(text));
+    client.send(Commands.Clipboard.STATE + Codec.toBase64(text));
   }
 
   private void sendHistory(ClientHandler client) {
@@ -96,14 +91,14 @@ public class ClipboardHandler {
     }
 
     for (ClipboardHistory.Entry entry : this.clipboardHistory.snapshot()) {
-      client.send(CLIPBOARD_ENTRY_PREFIX + entry.getId() + "," + entry.getTimestamp() + "," + encode(entry.getText()));
+      client.send(Commands.Clipboard.ENTRY + entry.getId() + "," + entry.getTimestamp() + "," + Codec.toBase64(entry.getText()));
     }
 
-    client.send(CLIPBOARD_HISTORY_END);
+    client.send(Commands.Clipboard.HISTORY_END);
   }
 
   private void handleSet(String data) {
-    String text = decode(data.substring(CLIPBOARD_SET_PREFIX.length()));
+    String text = decode(data.substring(Commands.Clipboard.SET.length()));
 
     if (text != null) {
       clipboardController.setText(text);
@@ -111,20 +106,16 @@ public class ClipboardHandler {
   }
 
   private void handleAppend(String data) {
-    String text = decode(data.substring(CLIPBOARD_APPEND_PREFIX.length()));
+    String text = decode(data.substring(Commands.Clipboard.APPEND.length()));
 
     if (text != null) {
       clipboardController.appendText(text);
     }
   }
 
-  private String encode(String text) {
-    return Base64.getEncoder().encodeToString(text.getBytes(StandardCharsets.UTF_8));
-  }
-
   private String decode(String payload) {
     try {
-      return new String(Base64.getDecoder().decode(payload), StandardCharsets.UTF_8);
+      return Codec.textFromBase64(payload);
     } catch (IllegalArgumentException exception) {
       System.err.println("[Clipboard] Malformed payload: " + payload);
 

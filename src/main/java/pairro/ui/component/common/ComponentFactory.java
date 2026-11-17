@@ -29,7 +29,10 @@ public class ComponentFactory {
     return tooltip;
   }
 
-  public static void setTooltip(Button button, String text) {
+  public static void setTooltip(
+    Button button,
+    String text
+  ) {
     button.setTooltip(createTooltip(text));
   }
 
@@ -41,7 +44,10 @@ public class ComponentFactory {
     return button;
   }
 
-  public static Button createIconButton(String svgContent, String styleClass) {
+  public static Button createIconButton(
+    String svgContent,
+    String styleClass
+  ) {
     Button button = new Button();
     button.getStyleClass().addAll("icon-button", styleClass);
     button.setGraphic(IconFactory.createIcon(svgContent, "icon"));
@@ -62,7 +68,10 @@ public class ComponentFactory {
     return btn;
   }
 
-  public static Label createStatusBadge(String text, boolean positive) {
+  public static Label createStatusBadge(
+    String text,
+    boolean positive
+  ) {
     Label badge = new Label(text);
     badge.getStyleClass().add("status-badge");
     badge.setMaxWidth(Region.USE_PREF_SIZE);
@@ -79,25 +88,29 @@ public class ComponentFactory {
     return badge;
   }
 
-  public static VBox createInfoRow(String label, String value) {
+  public static VBox createInfoRow(
+    String label,
+    String value
+  ) {
     Label lbl = new Label(label);
     lbl.getStyleClass().add("info-label");
 
     Label val = new Label(value == null || value.isEmpty() ? "\u2014" : value);
     val.getStyleClass().add("info-value");
 
-    Tooltip tooltip = createTooltip(value);
-
     val.boundsInLocalProperty().addListener((obs, oldBounds, newBounds) -> {
       if (isTextClipped(val)) {
-        val.setTooltip(tooltip);
-      } else {
+        if (val.getTooltip() == null) {
+          val.setTooltip(createTooltip(value));
+        }
+      } else if (val.getTooltip() != null) {
         val.setTooltip(null);
       }
     });
 
     Button copyBtn = createIconButton(IconPaths.COPY, "copy-button");
     setTooltip(copyBtn, "Copy");
+
     copyBtn.setOnAction(e -> {
       ClipboardContent clipboardContent = new ClipboardContent();
       clipboardContent.putString(value == null ? "" : value);

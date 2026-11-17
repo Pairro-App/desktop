@@ -26,11 +26,12 @@ public class DeviceHeaderCard extends VBox {
   private boolean lastConnected = false;
 
   public DeviceHeaderCard(
-      String deviceName,
-      boolean connected,
-      Runnable onToggleConnection,
-      Runnable onRefresh,
-      Runnable onOpenSettings) {
+    String deviceName,
+    boolean connected,
+    Runnable onToggleConnection,
+    Runnable onRefresh,
+    Runnable onOpenSettings
+  ) {
     super(0);
     getStyleClass().add("header-card");
 
@@ -48,8 +49,7 @@ public class DeviceHeaderCard extends VBox {
     avatar.setPrefSize(40, 40);
     avatar.setMaxSize(40, 40);
 
-    avatar.getChildren().add(
-        IconFactory.createIcon(IconPaths.DESKTOP, "desktop-icon"));
+    avatar.getChildren().add(IconFactory.createIcon(IconPaths.DESKTOP, "desktop-icon"));
 
     HBox deviceDetails = new HBox(10, avatar, textBox);
     deviceDetails.setAlignment(Pos.CENTER_LEFT);
@@ -58,27 +58,15 @@ public class DeviceHeaderCard extends VBox {
     HBox.setHgrow(spacer, Priority.ALWAYS);
 
     powerBtn = ComponentFactory.createPowerToggle(connected);
-    powerBtn.setOnAction(e -> {
-      if (onToggleConnection != null) {
-        onToggleConnection.run();
-      }
-    });
+    powerBtn.setOnAction(e -> onToggleConnection.run());
 
     refreshBtn = ComponentFactory.createIconButton(IconPaths.REFRESH, "header-action-btn");
     ComponentFactory.setTooltip(refreshBtn, "Refresh devices");
-    refreshBtn.setOnAction(e -> {
-      if (onRefresh != null) {
-        onRefresh.run();
-      }
-    });
+    refreshBtn.setOnAction(e -> onRefresh.run());
 
     settingsBtn = ComponentFactory.createIconButton(IconPaths.SETTINGS, "header-action-btn");
     ComponentFactory.setTooltip(settingsBtn, "Settings");
-    settingsBtn.setOnAction(e -> {
-      if (onOpenSettings != null) {
-        onOpenSettings.run();
-      }
-    });
+    settingsBtn.setOnAction(e -> onOpenSettings.run());
 
     setConnected(connected);
 

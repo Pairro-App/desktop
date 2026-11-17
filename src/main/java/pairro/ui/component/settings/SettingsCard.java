@@ -9,7 +9,10 @@ import javafx.scene.layout.VBox;
 
 public class SettingsCard extends VBox {
 
-  public SettingsCard(String title, Node... rows) {
+  public SettingsCard(
+    String title,
+    Node... rows
+  ) {
     super(0);
     getStyleClass().add("settings-card");
 

@@ -12,11 +12,20 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
 public final class SettingsRows {
-  public static HBox switchRow(String title, String subtitle, boolean initial) {
+  public static HBox switchRow(
+    String title,
+    String subtitle,
+    boolean initial
+  ) {
     return switchRow(title, subtitle, initial, null);
   }
 
-  public static HBox switchRow(String title, String subtitle, boolean initial, Consumer<Boolean> onToggle) {
+  public static HBox switchRow(
+    String title,
+    String subtitle,
+    boolean initial,
+    Consumer<Boolean> onToggle
+  ) {
     ToggleSwitch toggle = new ToggleSwitch(initial);
 
     HBox row = new HBox(12, textBlock(title, subtitle), toggle);
@@ -27,24 +36,28 @@ public final class SettingsRows {
     row.setOnMouseClicked(e -> {
       toggle.toggle();
 
-      if (onToggle != null) {
-        onToggle.accept(toggle.isSelected());
-      }
+      onToggle.accept(toggle.isSelected());
     });
 
     return row;
   }
 
-  public static VBox textFieldRow(String title, String subtitle, String value, String prompt) {
+  public static VBox textFieldRow(
+    String title,
+    String subtitle,
+    String value,
+    String prompt
+  ) {
     return textFieldRow(title, subtitle, value, prompt, UnaryOperator.identity());
   }
 
   public static VBox textFieldRow(
-      String title,
-      String subtitle,
-      String value,
-      String prompt,
-      UnaryOperator<String> onCommit) {
+    String title,
+    String subtitle,
+    String value,
+    String prompt,
+    UnaryOperator<String> onCommit
+  ) {
     TextField field = new TextField(value);
     field.setPromptText(prompt);
     field.getStyleClass().add("settings-field");
@@ -65,7 +78,10 @@ public final class SettingsRows {
     return row;
   }
 
-  private static VBox textBlock(String title, String subtitle) {
+  private static VBox textBlock(
+    String title,
+    String subtitle
+  ) {
     Label titleLabel = new Label(title);
     titleLabel.getStyleClass().add("settings-title-text");
 

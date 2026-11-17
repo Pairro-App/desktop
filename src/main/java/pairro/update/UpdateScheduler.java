@@ -21,10 +21,11 @@ public final class UpdateScheduler {
   private Version lastAnnounced;
 
   public UpdateScheduler(
-      UpdateChecker checker,
-      Duration initialDelay,
-      Duration interval,
-      Consumer<Release> listener) {
+    UpdateChecker checker,
+    Duration initialDelay,
+    Duration interval,
+    Consumer<Release> listener
+  ) {
     this.checker = checker;
     this.initialDelay = initialDelay;
     this.interval = interval;

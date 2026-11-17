@@ -21,10 +21,11 @@ public class NetworkManager {
   private NetworkPairingListener pairingListener;
 
   public NetworkManager(
-      int tcpPort,
-      int udpPort,
-      InboundMessageRouter messageRouter,
-      UDPSessionState udpSession) {
+    int tcpPort,
+    int udpPort,
+    InboundMessageRouter messageRouter,
+    UDPSessionState udpSession
+  ) {
     this.tcpPort = tcpPort;
     this.udpPort = udpPort;
     this.messageRouter = messageRouter;
@@ -74,24 +75,24 @@ public class NetworkManager {
 
     System.out.println("[Network] Shutting down...");
 
-    if (this.tcpServer != null) {
-      this.tcpServer.shutdown();
-      this.tcpServer = null;
-    }
-
-    if (this.udpServer != null) {
-      this.udpServer.shutdown();
-      this.udpServer = null;
-    }
+    this.tcpServer.shutdown();
+    this.udpServer.shutdown();
 
     clearTrustedUdpAddress();
   }
 
-  public void handleData(String data, ClientHandler client) {
+  public void handleData(
+    String data,
+    ClientHandler client
+  ) {
     this.messageRouter.route(data, client);
   }
 
-  public void handleUdpPacket(byte[] data, int length, InetAddress sourceAddress) {
+  public void handleUdpPacket(
+    byte[] data,
+    int length,
+    InetAddress sourceAddress
+  ) {
     String command = this.udpSession.decrypt(data, length, sourceAddress);
 
     if (command != null) {
@@ -104,8 +105,6 @@ public class NetworkManager {
       clearTrustedUdpAddress();
     }
 
-    if (this.pairingListener != null) {
-      this.pairingListener.onDisconnect(client);
-    }
+    this.pairingListener.onDisconnect(client);
   }
 }

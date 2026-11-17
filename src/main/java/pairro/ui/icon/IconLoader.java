@@ -4,10 +4,15 @@ import java.io.InputStream;
 
 public final class IconLoader {
   private static final int[] ICON_SIZES = { 16, 32, 48, 64, 128, 256, 512 };
+  private static final int[] WINDOW_ICON_SIZES = { 16, 32, 48, 64, 256 };
   private static final String ICON_PATH = "/icons/icon-%d.png";
 
   public static int[] getIconSizes() {
     return ICON_SIZES;
+  }
+
+  public static int[] getWindowIconSizes() {
+    return WINDOW_ICON_SIZES;
   }
 
   public static InputStream loadIconStream(int size) {

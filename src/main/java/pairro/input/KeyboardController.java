@@ -3,22 +3,20 @@ package pairro.input;
 import java.awt.Robot;
 
 public class KeyboardController {
-  private final Robot robot = RobotProvider.getInstance();
+  private Robot robot() {
+    return RobotProvider.getInstance();
+  }
 
   public void executeKey(int keyCode) {
     executeCombo(new int[] { keyCode });
   }
 
   public void executeCombo(int[] keyCodes) {
-    if (this.robot == null || keyCodes == null || keyCodes.length == 0) {
-      return;
-    }
-
     int pressedCount = 0;
 
     try {
       for (int keyCode : keyCodes) {
-        this.robot.keyPress(keyCode);
+        robot().keyPress(keyCode);
 
         pressedCount++;
       }
@@ -27,7 +25,7 @@ public class KeyboardController {
     } finally {
       for (int i = pressedCount - 1; i >= 0; i--) {
         try {
-          this.robot.keyRelease(keyCodes[i]);
+          robot().keyRelease(keyCodes[i]);
         } catch (Exception e) {
           System.err.println("[KeyboardController] Failed to release key: " + e.getMessage());
         }

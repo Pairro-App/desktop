@@ -1,36 +1,35 @@
 package pairro.network.handler;
 
 import pairro.audio.AudioController;
+import pairro.network.Commands;
 import pairro.network.server.ClientHandler;
 
 public class AudioHandler {
-  private static final String VOLUME_GET = "VOLUME_GET";
-  private static final String VOLUME_SET_PREFIX = "VOLUME_SET:";
-  private static final String VOLUME_MUTE_PREFIX = "VOLUME_MUTE:";
-  private static final String VOLUME_STATE_PREFIX = "VOLUME_STATE:";
-
   private final AudioController audioController;
 
   public AudioHandler(AudioController audioController) {
     this.audioController = audioController;
   }
 
-  public boolean handleCommand(String data, ClientHandler client) {
+  public boolean handleCommand(
+    String data,
+    ClientHandler client
+  ) {
     if (data == null || data.isEmpty() || audioController == null) {
       return false;
     }
 
-    if (VOLUME_GET.equals(data)) {
+    if (Commands.Volume.GET.equals(data)) {
       sendState(client);
       return true;
     }
 
-    if (data.startsWith(VOLUME_SET_PREFIX)) {
+    if (data.startsWith(Commands.Volume.SET)) {
       handleVolumeSet(data);
       return true;
     }
 
-    if (data.startsWith(VOLUME_MUTE_PREFIX)) {
+    if (data.startsWith(Commands.Volume.MUTE)) {
       handleVolumeMute(data);
       return true;
     }
@@ -51,12 +50,12 @@ public class AudioHandler {
 
     int mutedFlag = audioController.isMuted() ? 1 : 0;
 
-    client.send(VOLUME_STATE_PREFIX + volumePercent + "," + mutedFlag);
+    client.send(Commands.Volume.STATE + volumePercent + "," + mutedFlag);
   }
 
   private void handleVolumeSet(String data) {
     try {
-      String payload = data.substring(VOLUME_SET_PREFIX.length());
+      String payload = data.substring(Commands.Volume.SET.length());
       int volumePercent = Integer.parseInt(payload.trim());
 
       audioController.setVolumePercent(volumePercent);
@@ -66,7 +65,7 @@ public class AudioHandler {
   }
 
   private void handleVolumeMute(String data) {
-    String payload = data.substring(VOLUME_MUTE_PREFIX.length()).trim();
+    String payload = data.substring(Commands.Volume.MUTE.length()).trim();
 
     if ("1".equals(payload)) {
       audioController.mute();

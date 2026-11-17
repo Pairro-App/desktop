@@ -11,12 +11,19 @@ public class DeviceDirectory {
 
   private String connectedDeviceId;
 
-  public DeviceDirectory(DeviceState deviceState, PairingService pairingService) {
+  public DeviceDirectory(
+    DeviceState deviceState,
+    PairingService pairingService
+  ) {
     this.deviceState = deviceState;
     this.pairingService = pairingService;
   }
 
-  public Device upsertDiscovered(String address, String name, String id) {
+  public Device upsertDiscovered(
+    String address,
+    String name,
+    String id
+  ) {
     Device device = deviceState.upsertDevice(address, name, id);
     device.setPaired(pairingService.isPaired(id));
     device.setConnected(id != null && id.equals(connectedDeviceId));
@@ -24,14 +31,23 @@ public class DeviceDirectory {
     return device;
   }
 
-  public Device markPaired(String addressKey, String deviceName, String deviceId) {
+  public Device markPaired(
+    String addressKey,
+    String deviceName,
+    String deviceId
+  ) {
     Device device = deviceState.upsertDevice(addressKey, deviceName, deviceId);
     device.setPaired(true);
 
     return device;
   }
 
-  public Device markConnected(String addressKey, String deviceName, String deviceId, ClientHandler client) {
+  public Device markConnected(
+    String addressKey,
+    String deviceName,
+    String deviceId,
+    ClientHandler client
+  ) {
     Device device = deviceState.upsertDevice(addressKey, deviceName, deviceId);
     device.setPaired(true);
     device.setConnected(true);
@@ -59,10 +75,6 @@ public class DeviceDirectory {
   }
 
   public void disconnectClient(String deviceId) {
-    if (deviceId == null) {
-      return;
-    }
-
     ClientHandler client = deviceState.getConnectedClient(deviceId);
 
     if (client != null) {
@@ -100,7 +112,10 @@ public class DeviceDirectory {
     }
   }
 
-  public void addPendingClient(String addressKey, ClientHandler client) {
+  public void addPendingClient(
+    String addressKey,
+    ClientHandler client
+  ) {
     deviceState.addPendingClient(addressKey, client);
   }
 
@@ -112,7 +127,7 @@ public class DeviceDirectory {
     pairingService.forget(device.getClientId());
     device.setPaired(false);
 
-    if (device.getClientId() != null && device.getClientId().equals(connectedDeviceId)) {
+    if (device.getClientId().equals(connectedDeviceId)) {
       disconnectClient(device.getClientId());
     }
   }

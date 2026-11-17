@@ -15,6 +15,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import pairro.app.AppCoordinator;
+import pairro.app.MemoryTrimmer;
 import pairro.app.PeripheralControllers;
 import pairro.audio.AudioController;
 import pairro.clipboard.ClipboardController;
@@ -46,6 +47,7 @@ import pairro.store.PairedDeviceStore;
 import pairro.store.SettingsStore;
 import pairro.ui.component.common.ResizableCanvas;
 import pairro.ui.component.common.TitleBar;
+import pairro.ui.icon.IconCache;
 import pairro.ui.icon.IconLoader;
 import pairro.ui.tray.TrayManager;
 import pairro.ui.view.DashboardView;
@@ -67,7 +69,7 @@ public class App extends Application {
   public void start(Stage primaryStage) {
     primaryStage.initStyle(StageStyle.UNDECORATED);
     primaryStage.setTitle(APP_TITLE);
-    primaryStage.getIcons().addAll(loadIcons());
+    primaryStage.getIcons().addAll(IconCache.windowIcons());
 
     SettingsStore settingsStore = new SettingsStore();
     TrayManager trayManager = new TrayManager(primaryStage, settingsStore);
@@ -93,15 +95,18 @@ public class App extends Application {
     });
     controller.startUpdateChecks();
 
-    ResizableCanvas canvas = new ResizableCanvas();
-    canvas.getStyleClass().add("white-canvas");
+    trayManager.setOnHidden(() -> {
+      dashboard.releaseTransientViews();
+      MemoryTrimmer.scheduleTrim();
+    });
+    trayManager.setOnShown(MemoryTrimmer::cancel);
 
-    StackPane canvasLayer = new StackPane(canvas, dashboard.getRoot());
+    StackPane contentLayer = new StackPane(dashboard.getRoot());
 
-    VBox.setVgrow(canvasLayer, Priority.ALWAYS);
+    VBox.setVgrow(contentLayer, Priority.ALWAYS);
     VBox.setVgrow(dashboard.getRoot(), Priority.ALWAYS);
 
-    VBox root = new VBox(titleBar, canvasLayer);
+    VBox root = new VBox(titleBar, contentLayer);
     root.getStyleClass().add("app-shell");
 
     Scene scene = new Scene(root, 470, 700);
@@ -115,22 +120,6 @@ public class App extends Application {
     if (settingsStore.isAutoStartDiscoverability()) {
       controller.toggleConnection();
     }
-  }
-
-  private List<Image> loadIcons() {
-    List<Image> icons = new ArrayList<>();
-
-    for (int size : IconLoader.getIconSizes()) {
-      try (InputStream inputStream = IconLoader.loadIconStream(size)) {
-        if (inputStream != null) {
-          icons.add(new Image(inputStream));
-        }
-      } catch (IOException exception) {
-        System.err.println("[App] Could not load icon: " + exception.getMessage());
-      }
-    }
-
-    return icons;
   }
 
   private AppCoordinator createAppCoordinator(SettingsStore settingsStore) {
@@ -155,7 +144,8 @@ public class App extends Application {
       keyboardInputHandler,
       audioHandler,
       clipboardHandler,
-      messenger);
+      messenger
+    );
     UDPSessionState udpSession = new UDPSessionState();
 
     NetworkManager networkManager = new NetworkManager(TCP_PORT, UDP_PORT, messageRouter, udpSession);
@@ -165,7 +155,8 @@ public class App extends Application {
       devices,
       networkManager,
       identity.getId(),
-      settingsStore::getDeviceName);
+      settingsStore::getDeviceName
+    );
 
     AppCoordinator controller = new AppCoordinator(pairing, devices);
 
@@ -183,20 +174,22 @@ public class App extends Application {
       devices,
       TCP_PORT,
       identity.getId(),
-      settingsStore::getDeviceName);
+      settingsStore::getDeviceName
+    );
 
     controller.setConnectionLifecycle(connectionLifecycle);
 
     AppVersion.current().ifPresentOrElse(
-        version -> controller.setUpdateScheduler(new UpdateScheduler(
-            new UpdateChecker(
-                new GitHubReleaseProvider(GitHubReleaseProvider.defaultHttpClient(), GITHUB_OWNER, GITHUB_REPO),
-                version,
-                settingsStore),
-            UPDATE_INITIAL_DELAY,
-            UPDATE_INTERVAL,
-            controller::onUpdateAvailable)),
-        () -> System.err.println("[App] App version unknown, update checks disabled"));
+      version -> controller.setUpdateScheduler(new UpdateScheduler(
+        new UpdateChecker(
+          new GitHubReleaseProvider(
+            GitHubReleaseProvider::defaultHttpClient, GITHUB_OWNER, GITHUB_REPO),
+            version,
+            settingsStore),
+        UPDATE_INITIAL_DELAY,
+        UPDATE_INTERVAL,
+        controller::onUpdateAvailable)
+      ), () -> System.err.println("[App] App version unknown, update checks disabled"));
 
     networkManager.setPairingListener(new NetworkPairingListener() {
       @Override
@@ -204,7 +197,8 @@ public class App extends Application {
         String deviceId,
         String deviceName,
         String publicKey,
-        ClientHandler client) {
+        ClientHandler client
+      ) {
         pairing.onPairRequest(deviceId, deviceName, publicKey, client);
       }
 
@@ -212,20 +206,23 @@ public class App extends Application {
       public void onAuthInit(
         String deviceId,
         String clientNonce,
-        ClientHandler client) {
+        ClientHandler client
+      ) {
         pairing.onAuthInit(deviceId, clientNonce, client);
       }
 
       @Override
       public void onAuthProof(
         String proof,
-        ClientHandler client) {
+        ClientHandler client
+      ) {
         pairing.onAuthProof(proof, client);
       }
 
       @Override
       public void onDisconnect(
-        ClientHandler client) {
+        ClientHandler client
+      ) {
         pairing.onDisconnect(client);
       }
     });
@@ -239,6 +236,7 @@ public class App extends Application {
     System.setProperty("prism.text", "native");
     System.setProperty("prism.allowhidpi", "true");
     System.setProperty("prism.lcdtext", "false");
+    System.setProperty("sun.java2d.d3d", "false");
     launch(args);
   }
 }

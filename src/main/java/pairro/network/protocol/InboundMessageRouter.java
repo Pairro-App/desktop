@@ -1,5 +1,6 @@
 package pairro.network.protocol;
 
+import pairro.network.Commands;
 import pairro.network.NetworkDataListener;
 import pairro.network.NetworkPairingListener;
 import pairro.network.handler.AudioHandler;
@@ -19,11 +20,12 @@ public class InboundMessageRouter {
   private NetworkDataListener dataListener;
 
   public InboundMessageRouter(
-      MouseInputHandler mouseInputHandler,
-      KeyboardInputHandler keyboardInputHandler,
-      AudioHandler audioHandler,
-      ClipboardHandler clipboardHandler,
-      ProtocolMessenger messenger) {
+    MouseInputHandler mouseInputHandler,
+    KeyboardInputHandler keyboardInputHandler,
+    AudioHandler audioHandler,
+    ClipboardHandler clipboardHandler,
+    ProtocolMessenger messenger
+  ) {
     this.mouseInputHandler = mouseInputHandler;
     this.keyboardInputHandler = keyboardInputHandler;
     this.audioHandler = audioHandler;
@@ -39,7 +41,10 @@ public class InboundMessageRouter {
     this.dataListener = listener;
   }
 
-  public void route(String data, ClientHandler client) {
+  public void route(
+    String data,
+    ClientHandler client
+  ) {
     if (data == null || data.isEmpty()) {
       return;
     }
@@ -66,14 +71,14 @@ public class InboundMessageRouter {
       return;
     }
 
-    Protocol.Decoded decoded = Protocol.decode(data);
+    Protocol.Envelope message = Protocol.decode(data);
 
-    switch (decoded.type) {
-      case "PAIR_REQUEST": {
-        routePairRequest(decoded, client);
+    switch (message.type()) {
+      case Commands.Pair.REQUEST: {
+        routePairRequest(message, client);
         break;
       }
-      case "PING": {
+      case Commands.System.PING: {
         routePing(client);
         break;
       }
@@ -84,23 +89,26 @@ public class InboundMessageRouter {
     }
   }
 
-  private void routeUnauthenticated(String data, ClientHandler client) {
-    Protocol.Decoded decoded = Protocol.decode(data);
+  private void routeUnauthenticated(
+    String data,
+    ClientHandler client
+  ) {
+    Protocol.Envelope message = Protocol.decode(data);
 
-    switch (decoded.type) {
-      case "PAIR_REQUEST": {
-        routePairRequest(decoded, client);
+    switch (message.type()) {
+      case Commands.Pair.REQUEST: {
+        routePairRequest(message, client);
         break;
       }
-      case "AUTH_INIT": {
-        routeAuthInit(decoded, client);
+      case Commands.Auth.INIT: {
+        routeAuthInit(message, client);
         break;
       }
-      case "AUTH_PROOF": {
-        routeAuthProof(decoded, client);
+      case Commands.Auth.PROOF: {
+        routeAuthProof(message, client);
         break;
       }
-      case "PING": {
+      case Commands.System.PING: {
         routePing(client);
         break;
       }
@@ -115,39 +123,42 @@ public class InboundMessageRouter {
   }
 
   private void routePing(ClientHandler client) {
-    if (client != null && messenger != null) {
+    if (client != null) {
       messenger.sendPong(client);
     }
   }
 
-  private void routePairRequest(Protocol.Decoded decoded, ClientHandler client) {
-    if (pairingListener != null) {
-      pairingListener.onPairRequest(
-          decoded.fields.get("deviceId"),
-          decoded.fields.get("deviceName"),
-          decoded.fields.get("publicKey"),
-          client);
-    }
+  private void routePairRequest(
+    Protocol.Envelope message,
+    ClientHandler client
+  ) {
+    pairingListener.onPairRequest(
+      message.fields().get(Fields.DEVICE_ID),
+      message.fields().get(Fields.DEVICE_NAME),
+      message.fields().get(Fields.PUBLIC_KEY),
+      client
+    );
   }
 
-  private void routeAuthInit(Protocol.Decoded decoded, ClientHandler client) {
-    if (pairingListener != null) {
-      pairingListener.onAuthInit(
-        decoded.fields.get("deviceId"),
-        decoded.fields.get("nonce"),
-        client);
-    }
+  private void routeAuthInit(
+    Protocol.Envelope message,
+    ClientHandler client
+  ) {
+    pairingListener.onAuthInit(
+      message.fields().get(Fields.DEVICE_ID),
+      message.fields().get(Fields.NONCE),
+      client
+    );
   }
 
-  private void routeAuthProof(Protocol.Decoded decoded, ClientHandler client) {
-    if (pairingListener != null) {
-      pairingListener.onAuthProof(decoded.fields.get("proof"), client);
-    }
+  private void routeAuthProof(
+    Protocol.Envelope message,
+    ClientHandler client
+  ) {
+    pairingListener.onAuthProof(message.fields().get(Fields.PROOF), client);
   }
 
   private void routeApplicationData(String data, ClientHandler client) {
-    if (dataListener != null) {
-      dataListener.onData(data, client);
-    }
+    dataListener.onData(data, client);
   }
 }

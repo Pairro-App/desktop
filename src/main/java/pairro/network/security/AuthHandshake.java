@@ -4,7 +4,6 @@ import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
 import java.security.SecureRandom;
-import java.util.Base64;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -18,13 +17,11 @@ public final class AuthHandshake {
   private static final int NONCE_BYTES = 32;
   private static final SecureRandom RANDOM = new SecureRandom();
 
-  private AuthHandshake() {}
-
   public static String newNonce() {
     byte[] nonce = new byte[NONCE_BYTES];
     RANDOM.nextBytes(nonce);
 
-    return Base64.getEncoder().encodeToString(nonce);
+    return Codec.toBase64(nonce);
   }
 
   public static boolean isValidNonce(String nonce) {
@@ -33,13 +30,17 @@ public final class AuthHandshake {
     }
 
     try {
-      return Base64.getDecoder().decode(nonce).length == NONCE_BYTES;
+      return Codec.fromBase64(nonce).length == NONCE_BYTES;
     } catch (IllegalArgumentException e) {
       return false;
     }
   }
 
-  public static String proof(String token, String role, PendingAuth auth) {
+  public static String proof(
+    String token,
+    String role,
+    PendingAuth auth
+  ) {
     try {
       Mac mac = Mac.getInstance(HMAC_ALGORITHM);
       mac.init(new SecretKeySpec(token.getBytes(StandardCharsets.UTF_8), HMAC_ALGORITHM));
@@ -52,13 +53,16 @@ public final class AuthHandshake {
           auth.serverNonce(),
           auth.certificateFingerprint());
 
-      return Base64.getEncoder().encodeToString(mac.doFinal(transcript.getBytes(StandardCharsets.UTF_8)));
+      return Codec.toBase64(mac.doFinal(transcript.getBytes(StandardCharsets.UTF_8)));
     } catch (GeneralSecurityException e) {
       throw new IllegalStateException("Could not compute authentication proof", e);
     }
   }
 
-  public static boolean matches(String expected, String actual) {
+  public static boolean matches(
+    String expected,
+    String actual
+  ) {
     if (expected == null || actual == null) {
       return false;
     }
