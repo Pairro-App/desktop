@@ -1,5 +1,9 @@
 package pairro.ui.view;
 
+import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
+
 import javafx.animation.FadeTransition;
 import javafx.animation.Interpolator;
 import javafx.animation.ParallelTransition;
@@ -38,6 +42,8 @@ public class DashboardView implements DashboardEventListener {
   private ParallelTransition sheetAnimation;
   private TranslateTransition settingsAnimation;
   private SettingsPanel settingsPanel;
+  private final AtomicReference<List<Device>> pendingDevices = new AtomicReference<>();
+  private final AtomicBoolean deviceRefreshQueued = new AtomicBoolean(false);
   private final PairingBanner pairingBanner = new PairingBanner();
   private final UpdateBanner updateBanner = new UpdateBanner();
 
@@ -324,10 +330,15 @@ public class DashboardView implements DashboardEventListener {
   }
 
   @Override
-  public void onDeviceListUpdated(java.util.List<Device> devices) {
-    Platform.runLater(() -> {
-      devicesListPanel.setDevices(devices);
-    });
+  public void onDeviceListUpdated(List<Device> devices) {
+    pendingDevices.set(devices);
+
+    if (deviceRefreshQueued.compareAndSet(false, true)) {
+      Platform.runLater(() -> {
+        deviceRefreshQueued.set(false);
+        devicesListPanel.setDevices(pendingDevices.get());
+      });
+    }
   }
 
   @Override
