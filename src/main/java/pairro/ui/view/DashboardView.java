@@ -7,6 +7,8 @@ import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.CacheHint;
+import javafx.scene.Node;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
@@ -61,12 +63,8 @@ public class DashboardView implements DashboardEventListener {
     scrim.setVisible(false);
     scrim.setOnMouseClicked(e -> closeInformationPanel());
 
-    settingsPanel = new SettingsPanel(this::closeSettings, settingsStore, this::onDeviceNameChanged);
-    settingsPanel.setVisible(false);
-
-    mainContent = new StackPane(devicesListPanel, scrim, informationPanel, settingsPanel);
+    mainContent = new StackPane(devicesListPanel, scrim);
     mainContent.getStyleClass().add("dashboard-main");
-    StackPane.setAlignment(informationPanel, Pos.BOTTOM_CENTER);
 
     Rectangle clip = new Rectangle();
     clip.widthProperty().bind(mainContent.widthProperty());
@@ -87,9 +85,6 @@ public class DashboardView implements DashboardEventListener {
   }
 
   private void initPanels() {
-    informationPanel = new InformationPanel(this::closeInformationPanel);
-    informationPanel.setVisible(false);
-
     devicesListPanel = new DevicesListPanel(
       settingsStore.getDeviceName(),
       controller.isConnected(),
@@ -106,10 +101,62 @@ public class DashboardView implements DashboardEventListener {
   }
 
   private void onDeviceSelected(Device device) {
+    ensureInformationPanel();
     informationPanel.showDevice(device);
 
     if (!informationPanel.isVisible()) {
       openSheet();
+    }
+  }
+
+  private void ensureInformationPanel() {
+    if (informationPanel != null) {
+      return;
+    }
+
+    informationPanel = new InformationPanel(this::closeInformationPanel);
+    informationPanel.setVisible(false);
+
+    mainContent.getChildren().add(2, informationPanel);
+    StackPane.setAlignment(informationPanel, Pos.BOTTOM_CENTER);
+  }
+
+  private void ensureSettingsPanel() {
+    if (settingsPanel != null) {
+      return;
+    }
+
+    settingsPanel = new SettingsPanel(this::closeSettings, settingsStore, this::onDeviceNameChanged);
+    settingsPanel.setVisible(false);
+
+    mainContent.getChildren().add(settingsPanel);
+  }
+
+  private static void enableAnimationCache(Node node) {
+    node.setCache(true);
+    node.setCacheHint(CacheHint.SPEED);
+  }
+
+  private static void disableAnimationCache(Node node) {
+    node.setCache(false);
+    node.setCacheHint(CacheHint.DEFAULT);
+  }
+
+  public void releaseTransientViews() {
+    stopSheetAnimation();
+    stopSettingsAnimation();
+
+    scrim.setVisible(false);
+    scrim.setOpacity(0);
+
+    if (informationPanel != null) {
+      mainContent.getChildren().remove(informationPanel);
+      informationPanel = null;
+    }
+
+    if (settingsPanel != null) {
+      mainContent.getChildren().remove(settingsPanel);
+      settingsPanel = null;
     }
   }
 
@@ -120,6 +167,7 @@ public class DashboardView implements DashboardEventListener {
     scrim.setVisible(true);
     informationPanel.setTranslateY(SHEET_OFFSET);
     informationPanel.setVisible(true);
+    enableAnimationCache(informationPanel);
 
     TranslateTransition slide = new TranslateTransition(Duration.millis(240), informationPanel);
     slide.setToY(0);
@@ -128,16 +176,21 @@ public class DashboardView implements DashboardEventListener {
     FadeTransition fade = new FadeTransition(Duration.millis(240), scrim);
     fade.setToValue(1);
 
+    InformationPanel opening = informationPanel;
     sheetAnimation = new ParallelTransition(slide, fade);
+    sheetAnimation.setOnFinished(e -> disableAnimationCache(opening));
     sheetAnimation.play();
   }
 
   private void closeInformationPanel() {
-    if (!informationPanel.isVisible()) {
+    if (informationPanel == null || !informationPanel.isVisible()) {
       return;
     }
 
     stopSheetAnimation();
+
+    InformationPanel closing = informationPanel;
+    enableAnimationCache(closing);
 
     TranslateTransition slide = new TranslateTransition(Duration.millis(190), informationPanel);
     slide.setToY(SHEET_OFFSET);
@@ -148,9 +201,14 @@ public class DashboardView implements DashboardEventListener {
 
     sheetAnimation = new ParallelTransition(slide, fade);
     sheetAnimation.setOnFinished(e -> {
-      informationPanel.setVisible(false);
       scrim.setVisible(false);
-      informationPanel.clear();
+      closing.clear();
+      disableAnimationCache(closing);
+      mainContent.getChildren().remove(closing);
+
+      if (informationPanel == closing) {
+        informationPanel = null;
+      }
     });
     sheetAnimation.play();
   }
@@ -164,6 +222,7 @@ public class DashboardView implements DashboardEventListener {
 
   private void openSettings() {
     stopSettingsAnimation();
+    ensureSettingsPanel();
 
     settingsPanel.setTranslateX(SETTINGS_OFFSET);
     settingsPanel.setVisible(true);
@@ -174,17 +233,26 @@ public class DashboardView implements DashboardEventListener {
     settingsAnimation.play();
   }
 
+
   private void closeSettings() {
-    if (!settingsPanel.isVisible()) {
+    if (settingsPanel == null || !settingsPanel.isVisible()) {
       return;
     }
 
     stopSettingsAnimation();
 
-    settingsAnimation = new TranslateTransition(Duration.millis(190), settingsPanel);
+    SettingsPanel closing = settingsPanel;
+
+    settingsAnimation = new TranslateTransition(Duration.millis(190), closing);
     settingsAnimation.setToX(SETTINGS_OFFSET);
     settingsAnimation.setInterpolator(Interpolator.EASE_IN);
-    settingsAnimation.setOnFinished(e -> settingsPanel.setVisible(false));
+    settingsAnimation.setOnFinished(e -> {
+      mainContent.getChildren().remove(closing);
+
+      if (settingsPanel == closing) {
+        settingsPanel = null;
+      }
+    });
     settingsAnimation.play();
   }
 
