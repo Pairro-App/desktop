@@ -15,6 +15,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import pairro.app.AppCoordinator;
+import pairro.app.MemoryTrimmer;
 import pairro.app.PeripheralControllers;
 import pairro.audio.AudioController;
 import pairro.clipboard.ClipboardController;
@@ -94,12 +95,18 @@ public class App extends Application {
     });
     controller.startUpdateChecks();
 
-    StackPane canvasLayer = new StackPane(dashboard.getRoot());
+    trayManager.setOnHidden(() -> {
+      dashboard.releaseTransientViews();
+      MemoryTrimmer.scheduleTrim();
+    });
+    trayManager.setOnShown(MemoryTrimmer::cancel);
 
-    VBox.setVgrow(canvasLayer, Priority.ALWAYS);
+    StackPane contentLayer = new StackPane(dashboard.getRoot());
+
+    VBox.setVgrow(contentLayer, Priority.ALWAYS);
     VBox.setVgrow(dashboard.getRoot(), Priority.ALWAYS);
 
-    VBox root = new VBox(titleBar, canvasLayer);
+    VBox root = new VBox(titleBar, contentLayer);
     root.getStyleClass().add("app-shell");
 
     Scene scene = new Scene(root, 470, 700);
