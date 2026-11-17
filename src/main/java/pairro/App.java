@@ -46,6 +46,7 @@ import pairro.store.PairedDeviceStore;
 import pairro.store.SettingsStore;
 import pairro.ui.component.common.ResizableCanvas;
 import pairro.ui.component.common.TitleBar;
+import pairro.ui.icon.IconCache;
 import pairro.ui.icon.IconLoader;
 import pairro.ui.tray.TrayManager;
 import pairro.ui.view.DashboardView;
@@ -67,7 +68,7 @@ public class App extends Application {
   public void start(Stage primaryStage) {
     primaryStage.initStyle(StageStyle.UNDECORATED);
     primaryStage.setTitle(APP_TITLE);
-    primaryStage.getIcons().addAll(loadIcons());
+    primaryStage.getIcons().addAll(IconCache.windowIcons());
 
     SettingsStore settingsStore = new SettingsStore();
     TrayManager trayManager = new TrayManager(primaryStage, settingsStore);
@@ -112,22 +113,6 @@ public class App extends Application {
     if (settingsStore.isAutoStartDiscoverability()) {
       controller.toggleConnection();
     }
-  }
-
-  private List<Image> loadIcons() {
-    List<Image> icons = new ArrayList<>();
-
-    for (int size : IconLoader.getIconSizes()) {
-      try (InputStream inputStream = IconLoader.loadIconStream(size)) {
-        if (inputStream != null) {
-          icons.add(new Image(inputStream));
-        }
-      } catch (IOException exception) {
-        System.err.println("[App] Could not load icon: " + exception.getMessage());
-      }
-    }
-
-    return icons;
   }
 
   private AppCoordinator createAppCoordinator(SettingsStore settingsStore) {
