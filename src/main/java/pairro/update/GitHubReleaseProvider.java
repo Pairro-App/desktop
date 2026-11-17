@@ -7,9 +7,10 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 public final class GitHubReleaseProvider implements ReleaseProvider {
-  private final HttpClient http;
+  private final Supplier<HttpClient> httpFactory;
   private final URI endpoint;
   private final String userAgent;
   private final GitHubReleaseJsonParser parser = new GitHubReleaseJsonParser();
@@ -18,11 +19,11 @@ public final class GitHubReleaseProvider implements ReleaseProvider {
   private Release cached;
 
   public GitHubReleaseProvider(
-    HttpClient http,
+    Supplier<HttpClient> httpFactory,
     String owner,
     String repo
   ) {
-    this.http = http;
+    this.httpFactory = httpFactory;
     this.endpoint = URI.create("https://api.github.com/repos/" + owner + "/" + repo + "/releases/latest");
     this.userAgent = repo + "-update-checker";
   }
@@ -34,14 +35,15 @@ public final class GitHubReleaseProvider implements ReleaseProvider {
   @Override
   public synchronized Optional<Release> fetchLatest() throws IOException, InterruptedException {
     HttpRequest.Builder request = HttpRequest.newBuilder(endpoint)
-        .timeout(Duration.ofSeconds(15))
-        .header("Accept", "application/vnd.github+json")
-        .header("User-Agent", userAgent);
+      .timeout(Duration.ofSeconds(15))
+      .header("Accept", "application/vnd.github+json")
+      .header("User-Agent", userAgent);
 
     if (etag != null) {
       request.header("If-None-Match", etag);
     }
 
+    HttpClient http = httpFactory.get();
     HttpResponse<String> response = http.send(request.build(), HttpResponse.BodyHandlers.ofString());
 
     return switch (response.statusCode()) {

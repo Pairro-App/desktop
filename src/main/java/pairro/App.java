@@ -176,7 +176,7 @@ public class App extends Application {
       version -> controller.setUpdateScheduler(new UpdateScheduler(
         new UpdateChecker(
           new GitHubReleaseProvider(
-            GitHubReleaseProvider.defaultHttpClient(), GITHUB_OWNER, GITHUB_REPO),
+            GitHubReleaseProvider::defaultHttpClient, GITHUB_OWNER, GITHUB_REPO),
             version,
             settingsStore),
         UPDATE_INITIAL_DELAY,
