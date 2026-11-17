@@ -93,10 +93,7 @@ public class App extends Application {
     });
     controller.startUpdateChecks();
 
-    ResizableCanvas canvas = new ResizableCanvas();
-    canvas.getStyleClass().add("white-canvas");
-
-    StackPane canvasLayer = new StackPane(canvas, dashboard.getRoot());
+    StackPane canvasLayer = new StackPane(dashboard.getRoot());
 
     VBox.setVgrow(canvasLayer, Priority.ALWAYS);
     VBox.setVgrow(dashboard.getRoot(), Priority.ALWAYS);
