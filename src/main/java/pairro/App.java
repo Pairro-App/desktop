@@ -244,6 +244,7 @@ public class App extends Application {
     System.setProperty("prism.text", "native");
     System.setProperty("prism.allowhidpi", "true");
     System.setProperty("prism.lcdtext", "false");
+    System.setProperty("sun.java2d.d3d", "false");
     launch(args);
   }
 }
