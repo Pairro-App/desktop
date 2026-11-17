@@ -6,7 +6,7 @@ import java.awt.Robot;
 public class RobotProvider {
   private static Robot instance;
 
-  public static Robot getInstance() {
+  public static synchronized Robot getInstance() {
     if (instance == null) {
       try {
         instance = new Robot();
