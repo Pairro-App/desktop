@@ -98,12 +98,12 @@ public class ComponentFactory {
     Label val = new Label(value == null || value.isEmpty() ? "\u2014" : value);
     val.getStyleClass().add("info-value");
 
-    Tooltip tooltip = createTooltip(value);
-
     val.boundsInLocalProperty().addListener((obs, oldBounds, newBounds) -> {
       if (isTextClipped(val)) {
-        val.setTooltip(tooltip);
-      } else {
+        if (val.getTooltip() == null) {
+          val.setTooltip(createTooltip(value));
+        }
+      } else if (val.getTooltip() != null) {
         val.setTooltip(null);
       }
     });
